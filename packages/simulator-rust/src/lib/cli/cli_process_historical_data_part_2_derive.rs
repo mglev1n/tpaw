@@ -24,6 +24,9 @@ use crate::{
             v7::v7_raw_monthly_non_log_series::{
                 V7_RAW_MONTHLY_NON_LOG_SERIES, V7_RAW_MONTHLY_NON_LOG_SERIES_START,
             },
+            v8::v8_raw_monthly_non_log_series::{
+                V8_RAW_MONTHLY_NON_LOG_SERIES, V8_RAW_MONTHLY_NON_LOG_SERIES_START,
+            },
             AnnualLogMeanFromOneOverCAPERegressionInfo, EmpiricalStats32,
             FiveTenTwentyThirtyYearsSlopeAndIntercept, RawCAPESeriesEntry,
             RawMonthlyNonLogSeriesEntry,
@@ -65,6 +68,7 @@ fn get_raw_monthly_non_log_series(
         HistoricalReturnsId::V5 => &V5_RAW_MONTHLY_NON_LOG_SERIES,
         HistoricalReturnsId::V6 => &V6_RAW_MONTHLY_NON_LOG_SERIES,
         HistoricalReturnsId::V7 => &V7_RAW_MONTHLY_NON_LOG_SERIES,
+        HistoricalReturnsId::V8 => &V8_RAW_MONTHLY_NON_LOG_SERIES,
     }
 }
 
@@ -88,6 +92,7 @@ fn generate_regressions(returns_id: &HistoricalReturnsId, base_dir: &str) {
         HistoricalReturnsId::V5 => &V5_RAW_MONTHLY_NON_LOG_SERIES_START,
         HistoricalReturnsId::V6 => &V6_RAW_MONTHLY_NON_LOG_SERIES_START,
         HistoricalReturnsId::V7 => &V7_RAW_MONTHLY_NON_LOG_SERIES_START,
+        HistoricalReturnsId::V8 => &V8_RAW_MONTHLY_NON_LOG_SERIES_START,
     };
 
     assert!(
