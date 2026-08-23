@@ -1,0 +1,61 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Accumulation grid base",
+    "description": "Two-physician household. Down-payment cash invested ($865k portfolio); house purchased June 2027 ($400k from portfolio). Savings components grow 2.5%/yr real: fellowship $120k/yr to mid-2028, then Michael ~$45k/yr and spouse ~$115k/yr. $5M legacy target. Career, earner, family, and state decisions are grid dimensions.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": { "years": 37 },
+      "retirementAge": { "years": 60 },
+      "maxAge": { "years": 95 }
+    },
+    "person2": {
+      "currentAge": { "years": 38 },
+      "retirementAge": { "years": 60 },
+      "maxAge": { "years": 95 }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": { "balance": 865000 },
+  "events": [
+    {
+      "id": "save-fellowship",
+      "label": "Savings (fellowship years)",
+      "kind": "savings",
+      "amount": { "perYear": 120000 },
+      "growth": { "annualPercent": 2.5 },
+      "timing": { "from": { "named": "now" }, "to": { "calendarYear": 2028, "month": 6 } }
+    },
+    {
+      "id": "save-michael",
+      "label": "Savings (Michael, academic)",
+      "kind": "savings",
+      "amount": { "perYear": 45000 },
+      "growth": { "annualPercent": 2.5 },
+      "timing": { "from": { "calendarYear": 2028, "month": 7 }, "to": { "named": "lastWorkingMonth", "person": "person1" } }
+    },
+    {
+      "id": "save-spouse",
+      "label": "Savings (spouse)",
+      "kind": "savings",
+      "amount": { "perYear": 115000 },
+      "growth": { "annualPercent": 2.5 },
+      "timing": { "from": { "calendarYear": 2028, "month": 7 }, "to": { "named": "lastWorkingMonth", "person": "person2" } }
+    },
+    {
+      "id": "house-down-payment",
+      "label": "House down payment",
+      "kind": "expenseEssential",
+      "amount": { "oneTime": 400000 },
+      "timing": { "at": { "calendarYear": 2027, "month": 6 } }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": { "fixed": { "stocks": 0.05, "bonds": 0.02 } },
+    "inflation": { "manual": 0.024 },
+    "sampling": { "type": "monteCarlo", "numRuns": 2000, "seed": 1776 },
+    "legacy": 5000000
+  }
+}

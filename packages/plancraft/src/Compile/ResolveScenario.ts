@@ -35,12 +35,13 @@ const _zodIssues = (path: string, error: z.ZodError): string =>
 
 // Merge b into a. Objects merge deep, arrays and scalars replace. Events are
 // handled separately (by id) and must not be passed through here.
-const _mergeNonEventFields = <T>(a: T, b: T): T =>
+export const mergeNonEventFields = <T>(a: T, b: T): T =>
   _.mergeWith(_.cloneDeep(a), b, (_aVal, bVal) =>
     Array.isArray(bVal) ? bVal : undefined,
   )
+const _mergeNonEventFields = mergeNonEventFields
 
-const _mergeEventsById = (
+export const mergeEventsById = (
   base: ScenarioEvent[],
   overlay: ScenarioEvent[],
 ): ScenarioEvent[] => {
@@ -127,7 +128,7 @@ const _resolveAuthored = (
 
   const merged: Omit<AuthoredScenarioFile, 'composition'> = {
     ..._mergeNonEventFields(baseNonEvent as typeof ownNonEvent, ownNonEvent),
-    events: _mergeEventsById(baseEvents ?? [], ownEvents ?? []),
+    events: mergeEventsById(baseEvents ?? [], ownEvents ?? []),
   }
 
   for (const includePath of composition?.include ?? []) {
@@ -137,7 +138,7 @@ const _resolveAuthored = (
     )
     if (!fragmentParsed.success)
       throw new ScenarioError(_zodIssues(fragmentPath, fragmentParsed.error))
-    merged.events = _mergeEventsById(
+    merged.events = mergeEventsById(
       merged.events ?? [],
       fragmentParsed.data.events,
     )

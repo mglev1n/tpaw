@@ -12,7 +12,14 @@ import {
   SimulationOutcome,
 } from './Engine/SimulateClient'
 import { writeOutputBundle } from './Emit/OutputBundle'
-import { loadAndCompileScenario, runScenarios } from './Batch/RunMatrix'
+import {
+  loadAndCompileScenario,
+  runCompiledScenarios,
+  runScenarios,
+  startOfTodayUtc,
+} from './Batch/RunMatrix'
+import { generateGrid } from './Grid/GenerateGrid'
+import { getGridCsv, getGridHtml, getGridReportData } from './Report/GridReport'
 import { getCompareData } from './Report/CompareData'
 import { getComparisonHtml } from './Report/HtmlReport'
 
@@ -185,6 +192,84 @@ const scenarioSlugOfPath = (
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+program
+  .command('grid')
+  .description(
+    'Run a full-factorial scenario grid (base + dimensions file) and write a ' +
+      'grid report (ranked outcomes, per-decision effects, heatmaps).',
+  )
+  .argument('<gridFile>', 'grid JSON file')
+  .option('-o, --out <file>', 'output HTML file', 'grid-report.html')
+  .option('--csv <file>', 'also write the full results table as CSV')
+  .option('-u, --url <url>', 'simulator base URL', DEFAULT_SIMULATOR_URL)
+  .option('--cache-dir <dir>', 'result cache directory', '.plancraft-cache')
+  .option('--no-cache', 'do not read or write the result cache')
+  .option('--concurrency <n>', 'parallel simulator requests', '2')
+  .action(
+    async (
+      gridFile: string,
+      opts: {
+        out: string
+        csv?: string
+        url: string
+        cacheDir: string
+        cache: boolean
+        concurrency: string
+      },
+    ) => {
+      try {
+        const generated = generateGrid(
+          path.resolve(gridFile),
+          (p) => fs.readFileSync(p, 'utf8'),
+          (fromFile, relative) => path.resolve(path.dirname(fromFile), relative),
+        )
+        console.log(
+          `${generated.grid.name}: ${generated.combos.length} combinations (` +
+            generated.grid.dimensions
+              .map((d) => `${d.name}: ${d.variants.length}`)
+              .join(', ') +
+            ')',
+        )
+        const now = startOfTodayUtc()
+        const jobs = generated.combos.map((combo) => ({
+          scenarioPath: gridFile,
+          compiled: compileScenario(combo.scenario, { now }),
+        }))
+        let done = 0
+        const runs = await runCompiledScenarios(jobs, {
+          url: opts.url,
+          cacheDir: opts.cache ? opts.cacheDir : undefined,
+          concurrency: parseInt(opts.concurrency, 10),
+          onProgress: (message) => {
+            done++
+            if (done % 10 === 0 || done === jobs.length)
+              console.log(`  ${done}/${jobs.length} (${message.split(':')[1]?.trim()})`)
+          },
+        })
+        const data = getGridReportData(generated, runs)
+        fs.writeFileSync(
+          opts.out,
+          getGridHtml(data, {
+            generatedNote:
+              `${runs.length} simulations | simulator: ${opts.url} | generated ` +
+              new Date().toISOString().slice(0, 10),
+          }),
+        )
+        console.log(`Report: ${opts.out}`)
+        if (opts.csv) {
+          fs.writeFileSync(opts.csv, getGridCsv(data))
+          console.log(`CSV: ${opts.csv}`)
+        }
+        for (const effect of data.mainEffects)
+          console.log(
+            `  ${effect.dimensionName}: impact range ${_fmtUsd(effect.spread)}/mo`,
+          )
+      } catch (e) {
+        _handleError(e)
+      }
+    },
+  )
 
 program
   .command('schema')

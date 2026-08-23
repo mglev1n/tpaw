@@ -17,20 +17,20 @@ const W = 860
 const H = 320
 const MARGIN = { top: 16, right: 130, bottom: 34, left: 64 }
 
-const _esc = (x: string) =>
+export const _esc = (x: string) =>
   x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
-const _usd = (x: number) =>
+export const _usd = (x: number) =>
   '$' + Math.round(x).toLocaleString('en-US')
 
-const _usdCompact = (x: number): string => {
+export const _usdCompact = (x: number): string => {
   const abs = Math.abs(x)
   if (abs >= 1e6) return `$${(x / 1e6).toFixed(abs >= 1e7 ? 0 : 1)}M`
   if (abs >= 1e3) return `$${(x / 1e3).toFixed(0)}K`
   return `$${x.toFixed(0)}`
 }
 
-const _pct = (x: number) => `${(x * 100).toFixed(1)}%`
+export const _pct = (x: number) => `${(x * 100).toFixed(1)}%`
 
 const _niceMax = (x: number): number => {
   if (x <= 0) return 1
@@ -396,7 +396,7 @@ document.querySelectorAll('svg.pc-chart').forEach((svg) => {
 })
 `
 
-const STYLE = `
+export const STYLE = `
 :root {
   color-scheme: light;
   --surface-1: #fcfcfb; --page: #f9f9f7;

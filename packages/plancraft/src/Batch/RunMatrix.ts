@@ -55,13 +55,26 @@ export const runScenarios = async (
     concurrency?: number
     onProgress?: (message: string) => void
   } = {},
+): Promise<ScenarioRun[]> =>
+  runCompiledScenarios(
+    scenarioPaths.map((scenarioPath) => ({
+      scenarioPath,
+      compiled: loadAndCompileScenario(scenarioPath),
+    })),
+    opts,
+  )
+
+export const runCompiledScenarios = async (
+  jobs: { scenarioPath: string; compiled: CompiledScenario }[],
+  opts: {
+    url?: string
+    cacheDir?: string
+    concurrency?: number
+    onProgress?: (message: string) => void
+  } = {},
 ): Promise<ScenarioRun[]> => {
   const concurrency = opts.concurrency ?? 2
   const onProgress = opts.onProgress ?? (() => {})
-  const jobs = scenarioPaths.map((scenarioPath) => ({
-    scenarioPath,
-    compiled: loadAndCompileScenario(scenarioPath),
-  }))
 
   const results: ScenarioRun[] = new Array(jobs.length)
   let next = 0
