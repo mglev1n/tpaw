@@ -1,7 +1,7 @@
 {
   "plancraftGrid": 1,
-  "name": "Retirement decision grid",
-  "description": "Career x (Michael retirement age x spouse pattern) x schooling x legacy x disability, replicated across three return conditions. Base: house June 2027 ($400k down), 2 kids (2027, 2029), savings growing 2.5%/yr real, PA. FERS annuity from Michael's VA service (high-3 $275k, service from 2018, no part-time proration - scale down if a proration factor applies). Disability: Michael cannot work from 2033; own-occupation DI nets $25k/yr savings while accumulating and $180k/yr income (real, to 65) once withdrawals begin; his career-switch income is conservatively excluded. Deferred FERS annuities are deflated 2.4%/yr from separation to 62.",
+  "name": "Retirement decision grid v2",
+  "description": "Corrected FERS (7/8 VA appointment, service from 2023, high-3 = FTE base+market $275k per 38 USC 7431(f); deferred annuities payable at 60 with 20+ yrs / 62 with 10-19 yrs, deflated 2.4%/yr from separation) plus Social Security claimed at 70 for both spouses. Simone's benefit reflects her later US career start (~2022): $4,100/mo real if she works to 60, $2,700/mo if she stops in 2038; her own benefit beats the spousal top-up in both patterns. Michael's SS varies with retirement age ($3,900-$5,100/mo). Disability: income stops 2033; DI nets $25k/yr savings then $180k/yr to 65; FERS $1,278/mo from 62; SS $2,900/mo from 70. Base otherwise unchanged: house June 2027, 2 kids, savings +2.5%/yr real, PA. SS amounts are scheduled-benefit estimates; trust-fund shortfall (~20% cut in the 2030s absent reform) is not modeled.",
   "base": "../grid/grid-base.scenario.json",
   "dimensions": [
     {
@@ -59,10 +59,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 50)",
+              "label": "FERS annuity (retire 50, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 3620
+                "perMonth": 2414
               },
               "timing": {
                 "from": {
@@ -74,6 +74,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -139,10 +179,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 50)",
+              "label": "FERS annuity (retire 50, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 3620
+                "perMonth": 2414
               },
               "timing": {
                 "from": {
@@ -154,6 +194,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -193,21 +273,61 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 55)",
+              "label": "FERS annuity (retire 55, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 5047
+                "perMonth": 3740
               },
               "timing": {
                 "from": {
                   "age": {
                     "person": "person1",
-                    "years": 62
+                    "years": 60
                   }
                 },
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4300
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -273,21 +393,61 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 55)",
+              "label": "FERS annuity (retire 55, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 5047
+                "perMonth": 3740
               },
               "timing": {
                 "from": {
                   "age": {
                     "person": "person1",
-                    "years": 62
+                    "years": 60
                   }
                 },
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4300
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -327,10 +487,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 60)",
+              "label": "FERS annuity (retire 60, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 7104
+                "perMonth": 5214
               },
               "timing": {
                 "from": {
@@ -340,6 +500,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -384,10 +584,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 60)",
+              "label": "FERS annuity (retire 60, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 7104
+                "perMonth": 5214
               },
               "timing": {
                 "from": {
@@ -397,6 +597,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -436,10 +676,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 65)",
+              "label": "FERS annuity (retire 65, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 9075
+                "perMonth": 6838
               },
               "timing": {
                 "from": {
@@ -449,6 +689,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -493,10 +773,10 @@
           "events": [
             {
               "id": "fers-annuity",
-              "label": "FERS annuity (retire 65)",
+              "label": "FERS annuity (retire 65, 7/8 prorated)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 9075
+                "perMonth": 6838
               },
               "timing": {
                 "from": {
@@ -506,6 +786,46 @@
                 "to": {
                   "named": "maxAge",
                   "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
                 }
               }
             },
@@ -828,13 +1148,33 @@
               "label": "FERS annuity (disability-shortened service)",
               "kind": "retirementIncome",
               "amount": {
-                "perMonth": 2192
+                "perMonth": 1278
               },
               "timing": {
                 "from": {
                   "age": {
                     "person": "person1",
                     "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, reduced record)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
                   }
                 },
                 "to": {
