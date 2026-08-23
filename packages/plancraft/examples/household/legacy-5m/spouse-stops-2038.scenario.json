@@ -1,0 +1,9 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Spouse stops 2038 + $5M legacy",
+    "description": "Spouse retires at 50 (2038) with a $5M bequest target - is work-optional still viable while preserving $5M for heirs?"
+  },
+  "composition": { "extends": "../spouse-work-optional-2038.scenario.json" },
+  "simulation": { "legacy": 5000000 }
+}
