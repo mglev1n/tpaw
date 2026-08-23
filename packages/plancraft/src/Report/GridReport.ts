@@ -78,7 +78,10 @@ export const getGridReportData = (
     const combo = combos[i % combos.length]!
     const { compiled, outcome } = run
     const wsMFN = compiled.withdrawalStartMFN
-    const spending = _medianSeries(outcome.withdrawalsTotal)
+    // General (lifestyle) spending only: totals would count earmarked
+    // essential expenses (e.g. tuition still being paid during an early
+    // retirement) as spending and invert cost comparisons.
+    const spending = _medianSeries(outcome.withdrawalsRegular)
     const balance = _medianSeries(outcome.balanceStart)
     return {
       conditionId: condition.id,
@@ -234,7 +237,7 @@ const _effectsSection = (data: GridReportData): string => {
     .join(' &nbsp;·&nbsp; ')
   return (
     `<section class="card"><h2 style="margin-top:0">What each decision is worth, by condition</h2>` +
-    `<p class="muted" style="font-size:13px">Mean of median first-year retirement spending per month, averaged across all other decisions. Deltas vs the dimension's first variant.</p>` +
+    `<p class="muted" style="font-size:13px">Mean of median first-year general (lifestyle) retirement spending per month — earmarked essential expenses such as tuition are excluded. Averaged across all other decisions; deltas vs the dimension's first variant.</p>` +
     groups +
     (data.conditions.length > 1
       ? `<p class="muted" style="font-size:13px">Combination ranking stability (Spearman rank correlation of all combos between conditions): ${stability}. Values near 1 mean the decision ordering does not depend on the condition.</p>`

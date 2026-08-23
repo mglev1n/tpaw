@@ -62,9 +62,11 @@ export const getCompareData = (
         .replace(/^-+|-+$/g, '')
     const median = outcome.balanceStart.find((x) => x.percentile === 50) ??
       outcome.balanceStart[Math.floor(outcome.balanceStart.length / 2)]
+    // General (lifestyle) spending; totals would include earmarked essential
+    // expenses that overlap the start of retirement.
     const medianSpending =
-      outcome.withdrawalsTotal.find((x) => x.percentile === 50) ??
-      outcome.withdrawalsTotal[Math.floor(outcome.withdrawalsTotal.length / 2)]
+      outcome.withdrawalsRegular.find((x) => x.percentile === 50) ??
+      outcome.withdrawalsRegular[Math.floor(outcome.withdrawalsRegular.length / 2)]
     const wsMFN = compiled.withdrawalStartMFN
     const spendingFirstYear = medianSpending
       ? medianSpending.data.slice(wsMFN, wsMFN + 12)

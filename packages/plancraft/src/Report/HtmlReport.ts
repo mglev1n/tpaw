@@ -514,7 +514,7 @@ export const getComparisonHtml = (data: CompareData, meta: { generatedNote: stri
 <section class="card">
 <h2 style="margin-top:0">Outcomes</h2>
 ${_comparisonTable(data)}
-<p class="muted" style="font-size:12.5px">Median retirement spending is the average monthly total spending over the first year of retirement at the 50th percentile. TPAW amortizes wealth, so ending balances near zero are by design when no legacy target is set.</p>
+<p class="muted" style="font-size:12.5px">Median retirement spending is the average monthly general (lifestyle) spending over the first year of retirement at the 50th percentile — earmarked essential expenses (e.g. tuition) are excluded. TPAW amortizes wealth, so ending balances near zero are by design when no legacy target is set.</p>
 </section>
 
 <section class="card">
