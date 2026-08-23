@@ -7,7 +7,7 @@ import {
   ScenarioError,
 } from '../Compile/ResolveScenario'
 import { ScenarioFile, scenarioFileSchema } from '../Schema/ScenarioSchema'
-import { GridFile, gridFileSchema, GridVariant } from './GridSchema'
+import { GridCondition, GridFile, gridFileSchema, GridVariant } from './GridSchema'
 
 export type GridCombo = {
   // dimension id -> variant id
@@ -22,7 +22,24 @@ export type GeneratedGrid = {
   grid: GridFile
   base: ScenarioFile
   combos: GridCombo[]
+  // At least one; a single no-op "base" condition when the grid file has none.
+  conditions: GridCondition[]
 }
+
+// A condition overlays only simulation settings onto a combo's scenario.
+export const applyCondition = (
+  scenario: ScenarioFile,
+  condition: GridCondition,
+): ScenarioFile =>
+  condition.simulation === undefined
+    ? scenario
+    : {
+        ...scenario,
+        simulation: mergeNonEventFields(
+          scenario.simulation ?? {},
+          condition.simulation,
+        ),
+      }
 
 const _applyVariant = (scenario: ScenarioFile, variant: GridVariant): ScenarioFile => {
   const { events, excludeEventIds, id: _id, name: _name, ...nonEvent } = variant
@@ -36,12 +53,8 @@ const _applyVariant = (scenario: ScenarioFile, variant: GridVariant): ScenarioFi
     events: mergeEventsById(scenario.events, events ?? []),
   }
   if (excludeEventIds && excludeEventIds.length > 0) {
-    const present = new Set(result.events.map((x) => x.id))
-    const missing = excludeEventIds.filter((x) => !present.has(x))
-    if (missing.length > 0)
-      throw new ScenarioError(
-        `Grid variant '${variant.id}': excludeEventIds not found: ${missing.join(', ')}`,
-      )
+    // Lenient: an id another dimension may or may not have added (e.g. a
+    // career-boost event absent in the baseline career) is skipped silently.
     const exclude = new Set(excludeEventIds)
     result.events = result.events.filter((x) => !exclude.has(x.id))
   }
@@ -113,5 +126,8 @@ export const generateGrid = (
       )
     combo.scenario = check.data
   }
-  return { grid, base, combos }
+  const conditions: GridCondition[] = grid.conditions ?? [
+    { id: 'base', name: 'Base', simulation: undefined },
+  ]
+  return { grid, base, combos, conditions }
 }

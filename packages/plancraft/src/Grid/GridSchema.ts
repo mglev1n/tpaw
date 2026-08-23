@@ -6,6 +6,25 @@ import { authoredScenarioFileSchema } from '../Schema/ScenarioSchema'
 // as scenario composition: events merge by id, other fields deep-merge).
 // The cross product of one variant per dimension yields the scenario set.
 
+const _agePatch = z.object({
+  years: z.number().int().gte(0).lte(115),
+  months: z.number().int().gte(0).lte(11).optional(),
+})
+const _personPatch = z.object({
+  currentAge: _agePatch.optional(),
+  retirementAge: _agePatch.optional(),
+  maxAge: _agePatch.optional(),
+})
+// Deep-partial household so a variant can patch a single field (e.g. only
+// person1.retirementAge). The merged combo is re-validated in full.
+const _householdPatch = z
+  .object({
+    person1: _personPatch.optional(),
+    person2: _personPatch.optional(),
+    withdrawalStart: z.enum(['person1', 'person2']).optional(),
+  })
+  .optional()
+
 const variantOverlay = z
   .object({
     id: z.string().regex(/^[a-zA-Z0-9_-]{1,40}$/),
@@ -13,7 +32,7 @@ const variantOverlay = z
     events: authoredScenarioFileSchema.shape.events
       .describe('Events merged into the base by id (same id replaces).'),
     excludeEventIds: z.array(z.string()).optional(),
-    household: authoredScenarioFileSchema.shape.household,
+    household: _householdPatch,
     portfolio: authoredScenarioFileSchema.shape.portfolio,
     simulation: authoredScenarioFileSchema.shape.simulation,
   })
@@ -35,5 +54,20 @@ export const gridFileSchema = z.object({
     )
     .min(1)
     .max(6),
+  // Conditions are states of the world (e.g. return assumptions), not
+  // decisions: every decision combo is run once per condition, and the
+  // report asks whether the decision ranking is stable across them.
+  conditions: z
+    .array(
+      z.object({
+        id: z.string().regex(/^[a-zA-Z0-9_-]{1,40}$/),
+        name: z.string().min(1).max(60),
+        simulation: authoredScenarioFileSchema.shape.simulation,
+      }),
+    )
+    .min(1)
+    .max(6)
+    .optional(),
 })
 export type GridFile = z.infer<typeof gridFileSchema>
+export type GridCondition = NonNullable<GridFile['conditions']>[number]

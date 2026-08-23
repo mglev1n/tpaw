@@ -18,7 +18,7 @@ import {
   runScenarios,
   startOfTodayUtc,
 } from './Batch/RunMatrix'
-import { generateGrid } from './Grid/GenerateGrid'
+import { applyCondition, generateGrid } from './Grid/GenerateGrid'
 import { getGridCsv, getGridHtml, getGridReportData } from './Report/GridReport'
 import { getCompareData } from './Report/CompareData'
 import { getComparisonHtml } from './Report/HtmlReport'
@@ -206,6 +206,7 @@ program
   .option('--cache-dir <dir>', 'result cache directory', '.plancraft-cache')
   .option('--no-cache', 'do not read or write the result cache')
   .option('--concurrency <n>', 'parallel simulator requests', '2')
+  .option('--runs <n>', 'override Monte Carlo runs for every simulation')
   .action(
     async (
       gridFile: string,
@@ -216,6 +217,7 @@ program
         cacheDir: string
         cache: boolean
         concurrency: string
+        runs?: string
       },
     ) => {
       try {
@@ -229,13 +231,23 @@ program
             generated.grid.dimensions
               .map((d) => `${d.name}: ${d.variants.length}`)
               .join(', ') +
-            ')',
+            `) x ${generated.conditions.length} condition(s) = ${
+              generated.combos.length * generated.conditions.length
+            } simulations`,
         )
         const now = startOfTodayUtc()
-        const jobs = generated.combos.map((combo) => ({
-          scenarioPath: gridFile,
-          compiled: compileScenario(combo.scenario, { now }),
-        }))
+        // Condition-major order; GridReport relies on it.
+        const jobs = generated.conditions.flatMap((condition) =>
+          generated.combos.map((combo) => {
+            const compiled = compileScenario(
+              applyCondition(combo.scenario, condition),
+              { now },
+            )
+            if (opts.runs !== undefined)
+              compiled.simulationArgs.numRuns = parseInt(opts.runs, 10)
+            return { scenarioPath: gridFile, compiled }
+          }),
+        )
         let done = 0
         const runs = await runCompiledScenarios(jobs, {
           url: opts.url,
