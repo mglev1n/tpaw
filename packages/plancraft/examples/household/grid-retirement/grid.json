@@ -1,7 +1,7 @@
 {
   "plancraftGrid": 1,
-  "name": "Retirement decision grid v2",
-  "description": "Corrected FERS (7/8 VA appointment, service from 2023, high-3 = FTE base+market $275k per 38 USC 7431(f); deferred annuities payable at 60 with 20+ yrs / 62 with 10-19 yrs, deflated 2.4%/yr from separation) plus Social Security claimed at 70 for both spouses. Simone's benefit reflects her later US career start (~2022): $4,100/mo real if she works to 60, $2,700/mo if she stops in 2038; her own benefit beats the spousal top-up in both patterns. Michael's SS varies with retirement age ($3,900-$5,100/mo). Disability: income stops 2033; DI nets $25k/yr savings then $180k/yr to 65; FERS $1,278/mo from 62; SS $2,900/mo from 70. Base otherwise unchanged: house June 2027, 2 kids, savings +2.5%/yr real, PA. SS amounts are scheduled-benefit estimates; trust-fund shortfall (~20% cut in the 2030s absent reform) is not modeled.",
+  "name": "Retirement decision grid v3",
+  "description": "Corrected FERS (7/8 VA appointment, service from 2023, high-3 = FTE base+market $275k per 38 USC 7431(f); deferred annuities payable at 60 with 20+ yrs / 62 with 10-19 yrs, deflated 2.4%/yr from separation) plus Social Security claimed at 70 for both spouses. Simone's benefit reflects her later US career start (~2022): $4,100/mo real if she works to 60, $2,700/mo if she stops in 2038; her own benefit beats the spousal top-up in both patterns. Michael's SS varies with retirement age ($3,900-$5,100/mo). Disability: income stops 2033; DI nets $25k/yr savings then $180k/yr to 65; FERS $1,278/mo from 62; SS $2,900/mo from 70. New in v3: college top-up dimension - out-of-pocket college costs beyond the 529 ($1,300/mo/child birth-18 assumed to cover a baseline), at $0 / $25k / $50k per year per child in real dollars over each child's college years (child 1: Sep 2045 - Jun 2049; child 2: Sep 2047 - Jun 2051), modeled as essential expenses so they hit legacy and lifestyle spending, not the spending metric itself. Base otherwise unchanged: house June 2027, 2 kids, savings +2.5%/yr real, PA. SS amounts are scheduled-benefit estimates; trust-fund shortfall (~20% cut in the 2030s absent reform) is not modeled.",
   "base": "../grid/grid-base.scenario.json",
   "dimensions": [
     {
@@ -1032,6 +1032,101 @@
                 },
                 "to": {
                   "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "college",
+      "name": "College top-up (beyond 529)",
+      "variants": [
+        {
+          "id": "c529only",
+          "name": "529 covers",
+          "events": []
+        },
+        {
+          "id": "c25k",
+          "name": "+$25k/yr/child",
+          "events": [
+            {
+              "id": "college-topup-1",
+              "label": "College top-up (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 25000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2045,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "college-topup-2",
+              "label": "College top-up (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 25000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2047,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "c50k",
+          "name": "+$50k/yr/child",
+          "events": [
+            {
+              "id": "college-topup-1",
+              "label": "College top-up (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 50000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2045,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "college-topup-2",
+              "label": "College top-up (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 50000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2047,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2051,
                   "month": 6
                 }
               }
