@@ -1,0 +1,720 @@
+{
+  "$ref": "#/definitions/PlancraftScenario",
+  "definitions": {
+    "PlancraftEventFragment": {
+      "type": "object",
+      "properties": {
+        "plancraft": {
+          "type": "number",
+          "const": 1
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,40}$",
+                "description": "Stable identifier, unique within the scenario. Used by composition (a later file can replace or exclude an event by id)."
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 150,
+                "description": "Human-readable label shown in reports and the planner UI."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "savings",
+                  "retirementIncome",
+                  "expenseEssential",
+                  "expenseDiscretionary"
+                ],
+                "description": "What the money flow is. 'savings': net contribution to the portfolio before retirement (income minus all regular spending and taxes; also use a one-time 'savings' event for a windfall). 'retirementIncome': income arriving during retirement (Social Security, pension, part-time work after retirement). 'expenseEssential': a must-fund expense drawn from the portfolio at any time, pre- or post-retirement (mortgage years, daycare, school tuition, a one-time house down payment or car purchase) - funded conservatively by the planner. 'expenseDiscretionary': a nice-to-have expense (travel, upgrades) the planner may scale back in bad markets. Amounts must be >= 0: model windfalls as savings/income events, never as negative expenses."
+              },
+              "nominal": {
+                "type": "boolean",
+                "description": "If true the amount is in nominal (then-current) dollars rather than real dollars. Default false (real dollars) - recommended."
+              },
+              "amount": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "perMonth": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "perMonth"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Recurring amount per month, in dollars."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "perYear": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "perYear"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Recurring amount per year, in dollars (compiled to a monthly amount, rounded to whole dollars)."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "oneTime": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "oneTime"
+                    ],
+                    "additionalProperties": false,
+                    "description": "A single lump-sum amount, in dollars."
+                  }
+                ],
+                "description": "Dollar amount. Real, after-tax dollars unless nominal is true."
+              },
+              "timing": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "calendarYear": {
+                                "type": "integer",
+                                "minimum": 1900,
+                                "maximum": 2200,
+                                "description": "Calendar year, e.g. 2031."
+                              },
+                              "month": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 12,
+                                "description": "Calendar month 1-12. Defaults to January."
+                              }
+                            },
+                            "required": [
+                              "calendarYear"
+                            ],
+                            "additionalProperties": false,
+                            "description": "A calendar date. Interpreted relative to the scenario anchor year (meta.anchorYear): the compiler converts it to person1's age at that date, so the scenario stays reproducible over time."
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "age": {
+                                "type": "object",
+                                "properties": {
+                                  "person": {
+                                    "type": "string",
+                                    "enum": [
+                                      "person1",
+                                      "person2"
+                                    ],
+                                    "description": "Defaults to 'person1'."
+                                  },
+                                  "years": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 115
+                                  },
+                                  "months": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 11
+                                  }
+                                },
+                                "required": [
+                                  "years"
+                                ],
+                                "additionalProperties": false,
+                                "description": "An age of a household member."
+                              }
+                            },
+                            "required": [
+                              "age"
+                            ],
+                            "additionalProperties": false,
+                            "description": "A point in time expressed as a person's age."
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "named": {
+                                "type": "string",
+                                "enum": [
+                                  "now",
+                                  "lastWorkingMonth",
+                                  "retirement",
+                                  "maxAge"
+                                ],
+                                "description": "'now' = the present. 'lastWorkingMonth' = the month before retirement. 'retirement' = the retirement month. 'maxAge' = end of plan (death age)."
+                              },
+                              "person": {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/1/properties/age/properties/person",
+                                "description": "Whose milestone (ignored for 'now'). Defaults to 'person1'."
+                              }
+                            },
+                            "required": [
+                              "named"
+                            ],
+                            "additionalProperties": false,
+                            "description": "A named milestone."
+                          }
+                        ],
+                        "description": "A point in time: a calendar date, an age, or a named milestone."
+                      }
+                    },
+                    "required": [
+                      "at"
+                    ],
+                    "additionalProperties": false,
+                    "description": "When a one-time amount occurs. Requires amount.oneTime."
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/0"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/1"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/2"
+                              }
+                            ],
+                            "description": "First month of the range (inclusive)."
+                          },
+                          "to": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/0"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/1"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/2"
+                              }
+                            ],
+                            "description": "Last month of the range (inclusive)."
+                          }
+                        },
+                        "required": [
+                          "from",
+                          "to"
+                        ],
+                        "additionalProperties": false,
+                        "description": "A range given by start and end."
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/0"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/1"
+                              },
+                              {
+                                "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/2"
+                              }
+                            ],
+                            "description": "First month of the range (inclusive)."
+                          },
+                          "durationYears": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 120,
+                            "description": "Length of the range in years (may be fractional)."
+                          }
+                        },
+                        "required": [
+                          "from",
+                          "durationYears"
+                        ],
+                        "additionalProperties": false,
+                        "description": "A range given by start and duration."
+                      }
+                    ],
+                    "description": "A span of months over which a recurring amount applies."
+                  }
+                ],
+                "description": "When the flow occurs: {at} for one-time amounts, a range for recurring amounts."
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "amount",
+              "timing"
+            ],
+            "additionalProperties": false,
+            "description": "One money flow. Model income steps (e.g. fellowship then attending salary) or part-time phases as consecutive savings events with different amounts and adjacent ranges."
+          },
+          "maxItems": 80
+        }
+      },
+      "required": [
+        "plancraft",
+        "events"
+      ],
+      "additionalProperties": false,
+      "description": "An event-fragment file: only events, merged into scenarios."
+    },
+    "PlancraftScenario": {
+      "type": "object",
+      "properties": {
+        "plancraft": {
+          "type": "number",
+          "const": 1,
+          "description": "Scenario format version. Must be 1."
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "description": "Scenario name."
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "anchorYear": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2200,
+              "description": "The calendar year that \"now\" corresponds to. Calendar-date timings are converted to ages relative to this. Defaults to the current year at compile time; set it explicitly for reproducibility."
+            },
+            "marketDataDate": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "YYYY-MM-DD date whose end-of-day market data the plan is frozen at (plans are \"dateless\" for reproducibility). Defaults to the most recent date the planner supports."
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "description": "Scenario identity and reproducibility anchors."
+        },
+        "household": {
+          "type": "object",
+          "properties": {
+            "person1": {
+              "type": "object",
+              "properties": {
+                "currentAge": {
+                  "type": "object",
+                  "properties": {
+                    "years": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 115,
+                      "description": "Whole years."
+                    },
+                    "months": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 11,
+                      "description": "Additional months, 0-11. Defaults to 0."
+                    }
+                  },
+                  "required": [
+                    "years"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Age today."
+                },
+                "retirementAge": {
+                  "type": "object",
+                  "properties": {
+                    "years": {
+                      "$ref": "#/definitions/PlancraftScenario/properties/household/properties/person1/properties/currentAge/properties/years"
+                    },
+                    "months": {
+                      "$ref": "#/definitions/PlancraftScenario/properties/household/properties/person1/properties/currentAge/properties/months"
+                    }
+                  },
+                  "required": [
+                    "years"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Planned retirement age. If already retired, set equal to currentAge."
+                },
+                "maxAge": {
+                  "type": "object",
+                  "properties": {
+                    "years": {
+                      "$ref": "#/definitions/PlancraftScenario/properties/household/properties/person1/properties/currentAge/properties/years"
+                    },
+                    "months": {
+                      "$ref": "#/definitions/PlancraftScenario/properties/household/properties/person1/properties/currentAge/properties/months"
+                    }
+                  },
+                  "required": [
+                    "years"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Plan-until age (death age). Defaults to 100."
+                }
+              },
+              "required": [
+                "currentAge",
+                "retirementAge"
+              ],
+              "additionalProperties": false,
+              "description": "One household member."
+            },
+            "person2": {
+              "$ref": "#/definitions/PlancraftScenario/properties/household/properties/person1",
+              "description": "Partner, if any."
+            },
+            "withdrawalStart": {
+              "$ref": "#/definitions/PlancraftEventFragment/properties/events/items/properties/timing/anyOf/0/properties/at/anyOf/1/properties/age/properties/person",
+              "description": "With a partner: whose retirement begins portfolio withdrawals (the household's \"retirement\" boundary). Defaults to 'person1'."
+            }
+          },
+          "required": [
+            "person1"
+          ],
+          "additionalProperties": false,
+          "description": "Who the plan is for."
+        },
+        "portfolio": {
+          "type": "object",
+          "properties": {
+            "balance": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Current investable portfolio balance in dollars."
+            }
+          },
+          "required": [
+            "balance"
+          ],
+          "additionalProperties": false,
+          "description": "Current portfolio."
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PlancraftEventFragment/properties/events/items"
+          },
+          "maxItems": 80,
+          "description": "All money flows. The portfolio evolves from the current balance plus savings, minus expenses, with retirement spending computed by the strategy."
+        },
+        "simulation": {
+          "type": "object",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": [
+                "TPAW",
+                "SPAW",
+                "SWR"
+              ],
+              "description": "Withdrawal/allocation strategy. Default 'TPAW' (amortization based with Merton-derived allocation)."
+            },
+            "expectedReturns": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "fixed": {
+                      "type": "object",
+                      "properties": {
+                        "stocks": {
+                          "type": "number",
+                          "minimum": -0.01,
+                          "maximum": 0.1,
+                          "description": "Expected annual real stock return, e.g. 0.05."
+                        },
+                        "bonds": {
+                          "type": "number",
+                          "minimum": -0.01,
+                          "maximum": 0.1,
+                          "description": "Expected annual real bond return, e.g. 0.02."
+                        }
+                      },
+                      "required": [
+                        "stocks",
+                        "bonds"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "fixed"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fixed expected returns (rounded to 0.1% steps). Recommended for reproducible scenario comparison."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "preset": {
+                      "type": "string",
+                      "enum": [
+                        "regressionPrediction,20YearTIPSYield",
+                        "conservativeEstimate,20YearTIPSYield",
+                        "1/CAPE,20YearTIPSYield",
+                        "historical"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "preset"
+                  ],
+                  "additionalProperties": false,
+                  "description": "A tpawplanner preset that derives expected returns from current market data (varies day to day)."
+                }
+              ],
+              "description": "Expected returns for planning. Default: the planner's default preset ('regressionPrediction,20YearTIPSYield')."
+            },
+            "inflation": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "manual": {
+                      "type": "number",
+                      "minimum": -0.01,
+                      "maximum": 0.1,
+                      "description": "Annual inflation rate, e.g. 0.024."
+                    }
+                  },
+                  "required": [
+                    "manual"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fixed annual inflation (rounded to 0.1% steps)."
+                },
+                {
+                  "type": "string",
+                  "const": "suggested",
+                  "description": "Market-derived breakeven inflation."
+                }
+              ],
+              "description": "Inflation assumption (only affects nominal amounts and display). Default 'suggested'."
+            },
+            "sampling": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "monteCarlo"
+                    },
+                    "numRuns": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000,
+                      "description": "Number of Monte Carlo runs. Default 2000. The hosted simulator supports up to 5000."
+                    },
+                    "seed": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Random seed. Default 1776. Keep identical across compared scenarios."
+                    },
+                    "blockSizeYears": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 30,
+                      "description": "Block-bootstrap block size in years. Default 5."
+                    },
+                    "staggerRunStarts": {
+                      "type": "boolean",
+                      "description": "Default true."
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Monte Carlo (block bootstrap over historical returns)."
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "const": "historical"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Rolling historical windows (deterministic)."
+                }
+              ],
+              "description": "Return-sequence sampling. Default Monte Carlo."
+            },
+            "percentiles": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 99
+              },
+              "minItems": 1,
+              "maxItems": 9,
+              "description": "Percentiles to report for trajectories. Default [5, 25, 50, 75, 95]."
+            },
+            "riskTolerance": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 24,
+              "description": "TPAW risk tolerance at age 20, integer 0-24 (0 most conservative; 12 = default \"Moderate\")."
+            },
+            "spendingCeiling": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Monthly spending ceiling in dollars. Default none."
+            },
+            "spendingFloor": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Monthly spending floor in dollars. Default none."
+            },
+            "legacy": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Target legacy (bequest) in real dollars. Default 0."
+            },
+            "stockAllocation": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "end": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ],
+              "additionalProperties": false,
+              "description": "Stock allocation glide path (start = now, end = maxAge), used only by SPAW and SWR strategies. TPAW derives allocation itself. Default 0.5/0.5."
+            },
+            "swrWithdrawal": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "percentPerYear": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "percentPerYear"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "amountPerMonth": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "amountPerMonth"
+                  ],
+                  "additionalProperties": false
+                }
+              ],
+              "description": "SWR strategy only: the withdrawal rule. Default: tpawplanner's retirement-length-derived percentage."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Simulation settings, all optional with TPAW Planner defaults."
+        },
+        "composition": {
+          "type": "object",
+          "properties": {
+            "extends": {
+              "type": "string",
+              "description": "Relative path to a base scenario file. This file inherits everything from the base; fields given here win, and events merge by id (same id replaces the base event)."
+            },
+            "include": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Relative paths to event-fragment files ({ events: [...] }) merged in after extends, in order, by id."
+            },
+            "excludeEventIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Event ids to remove after all merging."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Lightweight scenario composition."
+        }
+      },
+      "required": [
+        "plancraft",
+        "meta",
+        "household",
+        "portfolio",
+        "events"
+      ],
+      "additionalProperties": false,
+      "description": "A plancraft scenario: a household financial trajectory in real, after-tax dollars, compiled to a TPAW Planner plan."
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
