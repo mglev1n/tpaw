@@ -65,6 +65,23 @@ Recurring events take a range `{ "from": <point>, "to": <point> }` (both
 inclusive) or `{ "from": <point>, "durationYears": 4 }`. One-time events take
 `{ "at": <point> }`.
 
+## Growth
+
+A recurring event can grow annually — e.g. salary growth flowing into
+savings:
+
+```jsonc
+{ "id": "save", "kind": "savings",
+  "amount": { "perYear": 160000 },
+  "growth": { "annualPercent": 2.5 },
+  "timing": { "from": { "calendarYear": 2028, "month": 7 }, "to": { "named": "lastWorkingMonth" } } }
+```
+
+Growth steps once a year on the anniversary of the range start (real growth
+unless the event is `nominal`). The compiler expands a growing stream into
+yearly-stepped plan entries, since the planner's own per-entry growth field
+is declared but not implemented. Not allowed on one-time amounts.
+
 Calendar dates are converted to ages using `meta.anchorYear` (the year "now"
 is in). Set `anchorYear` explicitly so the scenario means the same thing
 whenever it is compiled; with it set, "now" is January of that year.

@@ -1,0 +1,24 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Buy house 2029",
+    "description": "Purchase in June 2029: $400k down payment leaves the portfolio; until then, $2,000/mo incremental rent for the larger rental (from 2027)."
+  },
+  "composition": { "extends": "growth-base.scenario.json" },
+  "events": [
+    {
+      "id": "house-down-payment",
+      "label": "House down payment",
+      "kind": "expenseEssential",
+      "amount": { "oneTime": 400000 },
+      "timing": { "at": { "calendarYear": 2029, "month": 6 } }
+    },
+    {
+      "id": "extra-rent",
+      "label": "Incremental rent until purchase",
+      "kind": "expenseEssential",
+      "amount": { "perMonth": 2000 },
+      "timing": { "from": { "calendarYear": 2027, "month": 1 }, "to": { "calendarYear": 2029, "month": 5 } }
+    }
+  ]
+}

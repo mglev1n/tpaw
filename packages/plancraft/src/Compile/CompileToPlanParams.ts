@@ -2,6 +2,7 @@ import {
   CalendarDay,
   LabeledAmountTimed,
   LabeledAmountTimedList,
+  Month,
   Person,
   PlanParams,
   PlanParamsNormalized,
@@ -35,8 +36,23 @@ export type EventSchedule = {
   // Both inclusive. For one-time events start === end.
   mfnStart: number
   mfnEnd: number
+  // The amount in the first year of the range; with growth, later years step
+  // up by annualGrowthPercent at each anniversary of mfnStart (matching the
+  // stepped entries the compiler emits).
   perMonthAmount: number
+  annualGrowthPercent: number | null
   isOneTime: boolean
+}
+
+// The per-month amount in effect at mfn for a schedule, replicating the
+// compiler's yearly-step growth rounding exactly.
+export const scheduleAmountAt = (s: EventSchedule, mfn: number): number => {
+  if (mfn < s.mfnStart || mfn > s.mfnEnd) return 0
+  if (s.annualGrowthPercent === null) return s.perMonthAmount
+  const yearIndex = Math.floor((mfn - s.mfnStart) / 12)
+  return Math.round(
+    s.perMonthAmount * Math.pow(1 + s.annualGrowthPercent / 100, yearIndex),
+  )
 }
 
 export type SimulationArgs = {
@@ -105,6 +121,7 @@ export const compileScenario = (
   }
   const schedules: EventSchedule[] = []
   const usedIds = new Set<string>()
+  let entryCounter = 0
 
   scenario.events.forEach((event, index) => {
     const context = `events[${index}] (id: ${event.id})`
@@ -114,29 +131,51 @@ export const compileScenario = (
           "already retired. Use kind 'retirementIncome'.",
       )
 
-    const { resolved, amountAndTiming } = _resolveEvent(event, ages, anchor, context)
+    const { resolved, amountAndTimingList } = _resolveEvent(
+      event,
+      ages,
+      anchor,
+      context,
+    )
 
-    let id = deterministicSmallId(event.id)
-    while (usedIds.has(id)) id = deterministicSmallId(id + 'x')
-    usedIds.add(id)
+    amountAndTimingList.forEach((amountAndTiming, segIndex) => {
+      let id = deterministicSmallId(
+        segIndex === 0 ? event.id : `${event.id}#${segIndex}`,
+      )
+      while (usedIds.has(id)) id = deterministicSmallId(id + 'x')
+      usedIds.add(id)
 
-    const entry: LabeledAmountTimed = {
-      label: event.label ?? event.id,
-      nominal: event.nominal ?? false,
-      id,
-      sortIndex: index,
-      colorIndex: index,
-      amountAndTiming,
-    }
-    entriesByLocation[_kindToLocation[event.kind]][id] = entry
+      const baseLabel = event.label ?? event.id
+      const entry: LabeledAmountTimed = {
+        label:
+          amountAndTimingList.length === 1
+            ? baseLabel
+            : `${baseLabel} (yr ${segIndex + 1})`.slice(0, 150),
+        nominal: event.nominal ?? false,
+        id,
+        sortIndex: index * 100 + segIndex,
+        colorIndex: entryCounter++,
+        amountAndTiming,
+      }
+      entriesByLocation[_kindToLocation[event.kind]][id] = entry
+    })
     schedules.push({
       eventId: event.id,
-      label: entry.label ?? event.id,
+      label: event.label ?? event.id,
       kind: event.kind,
-      nominal: entry.nominal,
+      nominal: event.nominal ?? false,
       ...resolved,
     })
   })
+
+  for (const [location, entries] of Object.entries(entriesByLocation)) {
+    if (Object.keys(entries).length > 100)
+      throw new ScenarioError(
+        `Too many entries for ${location} after growth expansion ` +
+          `(${Object.keys(entries).length} > 100, tpawplanner's limit). ` +
+          'Use fewer growing events or shorter ranges.',
+      )
+  }
 
   // ---- PlanParams assembly ----
   const planParams = getFullDatelessDefaultPlanParams(now)
@@ -245,14 +284,18 @@ const _resolveEvent = (
 ): {
   resolved: Pick<
     EventSchedule,
-    'mfnStart' | 'mfnEnd' | 'perMonthAmount' | 'isOneTime'
+    'mfnStart' | 'mfnEnd' | 'perMonthAmount' | 'annualGrowthPercent' | 'isOneTime'
   >
-  amountAndTiming: LabeledAmountTimed['amountAndTiming']
+  amountAndTimingList: LabeledAmountTimed['amountAndTiming'][]
 } => {
   if ('oneTime' in event.amount) {
     if (!('at' in event.timing))
       throw new ScenarioError(
         `${context}: a one-time amount needs timing of the form {at: ...}.`,
+      )
+    if (event.growth !== undefined)
+      throw new ScenarioError(
+        `${context}: growth is not allowed on one-time amounts.`,
       )
     const at: ResolvedTimePoint = resolveTimePoint(
       event.timing.at,
@@ -266,9 +309,10 @@ const _resolveEvent = (
         mfnStart: at.mfn,
         mfnEnd: at.mfn,
         perMonthAmount: amount,
+        annualGrowthPercent: null,
         isOneTime: true,
       },
-      amountAndTiming: { type: 'oneTime', amount, month: at.month },
+      amountAndTimingList: [{ type: 'oneTime', amount, month: at.month }],
     }
   }
 
@@ -286,25 +330,60 @@ const _resolveEvent = (
   const perMonthAmount = Math.round(
     'perMonth' in event.amount ? event.amount.perMonth : event.amount.perYear / 12,
   )
-  return {
-    resolved: {
-      mfnStart: range.start.mfn,
-      mfnEnd: range.end.mfn,
-      perMonthAmount,
-      isOneTime: false,
-    },
-    amountAndTiming: {
-      type: 'recurring',
-      monthRange: {
-        type: 'startAndEnd',
-        start: range.start.month,
-        end: range.end.month,
-      },
-      everyXMonths: 1,
-      baseAmount: perMonthAmount,
-      delta: null,
-    },
+  const growthPercent = event.growth?.annualPercent ?? null
+
+  const entryFor = (
+    startMonth: Month,
+    endMonth: Month,
+    amount: number,
+  ): LabeledAmountTimed['amountAndTiming'] => ({
+    type: 'recurring',
+    monthRange: { type: 'startAndEnd', start: startMonth, end: endMonth },
+    everyXMonths: 1,
+    baseAmount: amount,
+    delta: null,
+  })
+
+  const resolved = {
+    mfnStart: range.start.mfn,
+    mfnEnd: range.end.mfn,
+    perMonthAmount,
+    annualGrowthPercent: growthPercent === 0 ? null : growthPercent,
+    isOneTime: false,
   }
+
+  if (growthPercent === null || growthPercent === 0)
+    return {
+      resolved,
+      amountAndTimingList: [entryFor(range.start.month, range.end.month, perMonthAmount)],
+    }
+
+  // Growth: expand into yearly-stepped recurring entries. tpawplanner's
+  // per-entry percent growth is declared in its schema but rejected by its
+  // validator ("Not Implemented"), so stepped entries are the portable way
+  // to express a growing stream. Segment k covers months
+  // [start + 12k, start + 12k + 11] intersected with the range; boundary
+  // months are person1 numeric ages except the original start/end, which
+  // keep their authored anchoring (e.g. lastWorkingMonth).
+  const monthAtMFN = (mfn: number): Month => ({
+    type: 'numericAge',
+    person: 'person1',
+    age: { inMonths: ages.person1.currentAgeMonths + mfn },
+  })
+  const list: LabeledAmountTimed['amountAndTiming'][] = []
+  for (let k = 0; range.start.mfn + 12 * k <= range.end.mfn; k++) {
+    const segStartMFN = range.start.mfn + 12 * k
+    const segEndMFN = Math.min(segStartMFN + 11, range.end.mfn)
+    const amount = Math.round(perMonthAmount * Math.pow(1 + growthPercent / 100, k))
+    list.push(
+      entryFor(
+        k === 0 ? range.start.month : monthAtMFN(segStartMFN),
+        segEndMFN === range.end.mfn ? range.end.month : monthAtMFN(segEndMFN),
+        amount,
+      ),
+    )
+  }
+  return { resolved, amountAndTimingList: list }
 }
 
 const _applySimulationSettings = (

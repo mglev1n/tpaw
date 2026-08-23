@@ -166,6 +166,54 @@ describe('compileScenario', () => {
     expect(report).toContain('| 2031 |')
   })
 
+  test('growth expands into yearly-stepped entries matching the schedule', () => {
+    const scenario = baseScenario()
+    scenario.events = [
+      {
+        id: 'save-growing',
+        kind: 'savings',
+        amount: { perMonth: 10000 },
+        growth: { annualPercent: 2.5 },
+        timing: { from: { named: 'now' }, durationYears: 3 },
+      },
+    ]
+    const compiled = compileScenario(scenario, { now: NOW })
+    const entries = Object.values(compiled.planParams.wealth.futureSavings).sort(
+      (a, b) => a.sortIndex - b.sortIndex,
+    )
+    expect(entries).toHaveLength(3)
+    const amounts = entries.map((e) =>
+      e.amountAndTiming.type === 'recurring' ? e.amountAndTiming.baseAmount : -1,
+    )
+    expect(amounts).toEqual([10000, 10250, Math.round(10000 * 1.025 * 1.025)])
+    // Schedule replicates the same steps.
+    const schedule = compiled.schedules[0]!
+    expect(schedule.annualGrowthPercent).toBe(2.5)
+    const { getMonthlySchedule } = require('./CompilationReport') as typeof import('./CompilationReport')
+    const monthly = getMonthlySchedule(compiled.schedules, 40)
+    expect(monthly.savings[0]).toBe(10000)
+    expect(monthly.savings[12]).toBe(10250)
+    expect(monthly.savings[24]).toBe(Math.round(10000 * 1.025 ** 2))
+    expect(monthly.savings[35]).toBe(Math.round(10000 * 1.025 ** 2))
+    expect(monthly.savings[36]).toBe(0) // range ended
+  })
+
+  test('growth on one-time amounts is rejected', () => {
+    const scenario = baseScenario()
+    scenario.events = [
+      {
+        id: 'bad-growth',
+        kind: 'expenseEssential',
+        amount: { oneTime: 1000 },
+        growth: { annualPercent: 2 },
+        timing: { at: { calendarYear: 2030 } },
+      },
+    ]
+    expect(() => compileScenario(scenario, { now: NOW })).toThrow(
+      /growth is not allowed/,
+    )
+  })
+
   test('single person, already retired household compiles', () => {
     const scenario = scenarioFileSchema.parse({
       plancraft: 1,

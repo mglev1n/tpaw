@@ -1,5 +1,9 @@
 import _ from 'lodash'
-import { CompiledScenario, EventSchedule } from './CompileToPlanParams'
+import {
+  CompiledScenario,
+  EventSchedule,
+  scheduleAmountAt,
+} from './CompileToPlanParams'
 
 // The derived cash-flow schedule: for each month, the sum of each kind of
 // flow. This is the "net contributions" view that the scenario abstraction
@@ -24,7 +28,7 @@ export const getMonthlySchedule = (
   for (const s of schedules) {
     const target = result[s.kind]
     for (let mfn = s.mfnStart; mfn <= Math.min(s.mfnEnd, numMonths - 1); mfn++)
-      target[mfn] = (target[mfn] ?? 0) + s.perMonthAmount
+      target[mfn] = (target[mfn] ?? 0) + scheduleAmountAt(s, mfn)
   }
   return result
 }
@@ -99,8 +103,8 @@ export const getCompilationReport = (compiled: CompiledScenario): string => {
       `| ${s.label} | ${s.kind} | ${
         s.isOneTime ? `${s.mfnStart}` : `${s.mfnStart}–${s.mfnEnd}`
       } | $${_fmt(s.perMonthAmount)} | ${s.isOneTime ? 'one-time' : ''}${
-        s.nominal ? ' nominal' : ''
-      } |`,
+        s.annualGrowthPercent !== null ? `+${s.annualGrowthPercent}%/yr` : ''
+      }${s.nominal ? ' nominal' : ''} |`,
     )
   }
   lines.push('')

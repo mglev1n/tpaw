@@ -263,7 +263,11 @@ const _timelineSvg = (scenario: ScenarioCompare, colorIndex: number): string => 
       const title = `${event.label}: ${
         event.isOneTime
           ? _usd(event.perMonthAmount) + ' one-time'
-          : _usd(event.perMonthAmount) + '/mo'
+          : _usd(event.perMonthAmount) +
+            '/mo' +
+            (event.annualGrowthPercent !== null
+              ? ` growing ${event.annualGrowthPercent}%/yr`
+              : '')
       }`
       return (
         `<text x="${left - 10}" y="${yMid + 4}" class="tick" text-anchor="end">${_esc(_.truncate(event.label, { length: 32 }))}</text>` +

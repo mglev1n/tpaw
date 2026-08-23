@@ -179,6 +179,23 @@ const scenarioEvent = z
         'When the flow occurs: {at} for one-time amounts, a range for ' +
           'recurring amounts.',
       ),
+    growth: z
+      .object({
+        annualPercent: z
+          .number()
+          .gte(-10)
+          .lte(20)
+          .describe(
+            'Annual growth rate in percent, e.g. 2.5. Applied in yearly ' +
+              'steps from the start of the range. Real (above-inflation) ' +
+              'growth unless the event is nominal.',
+          ),
+      })
+      .optional()
+      .describe(
+        'Optional annual growth for recurring amounts (e.g. salary growth ' +
+          'flowing into savings). Not allowed on one-time amounts.',
+      ),
   })
   .describe(
     'One money flow. Model income steps (e.g. fellowship then attending ' +
