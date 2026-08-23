@@ -1,0 +1,20 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Both retire at 55",
+    "description": "Base, but both spouses retire at 55 (2044 for person1)."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "household": {
+    "person1": {
+      "currentAge": { "years": 37 },
+      "retirementAge": { "years": 55 },
+      "maxAge": { "years": 95 }
+    },
+    "person2": {
+      "currentAge": { "years": 38 },
+      "retirementAge": { "years": 55 },
+      "maxAge": { "years": 95 }
+    }
+  }
+}

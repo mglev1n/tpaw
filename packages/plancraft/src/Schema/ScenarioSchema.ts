@@ -474,5 +474,14 @@ export const authoredScenarioFileSchema = scenarioFileSchema
   .extend({
     plancraft: z.literal(1),
     meta: scenarioFileSchema.shape.meta,
+    // Deep-partial household so a variant can override just one person (the
+    // resolved scenario is still validated against the full schema).
+    household: z
+      .object({
+        person1: person.optional(),
+        person2: person.optional(),
+        withdrawalStart: personId.optional(),
+      })
+      .optional(),
   })
 export type AuthoredScenarioFile = z.infer<typeof authoredScenarioFileSchema>

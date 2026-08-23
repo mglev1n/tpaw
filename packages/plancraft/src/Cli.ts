@@ -12,20 +12,16 @@ import {
   SimulationOutcome,
 } from './Engine/SimulateClient'
 import { writeOutputBundle } from './Emit/OutputBundle'
+import { loadAndCompileScenario, runScenarios } from './Batch/RunMatrix'
+import { getCompareData } from './Report/CompareData'
+import { getComparisonHtml } from './Report/HtmlReport'
 
 const program = new Command()
 
 const _fmtUsd = (x: number) =>
   '$' + x.toLocaleString('en-US', { maximumFractionDigits: 0 })
 
-const _loadAndCompile = (scenarioPath: string): CompiledScenario => {
-  const resolved = resolveScenario(
-    path.resolve(scenarioPath),
-    (p) => fs.readFileSync(p, 'utf8'),
-    (fromFile, relative) => path.resolve(path.dirname(fromFile), relative),
-  )
-  return compileScenario(resolved)
-}
+const _loadAndCompile = loadAndCompileScenario
 
 const _handleError = (e: unknown): never => {
   if (e instanceof ScenarioError) {
@@ -122,6 +118,73 @@ program
       }
     },
   )
+
+program
+  .command('compare')
+  .description(
+    'Simulate multiple scenarios and write a self-contained HTML comparison report.',
+  )
+  .argument('<scenarios...>', 'scenario JSON files')
+  .option('-o, --out <file>', 'output HTML file', 'report.html')
+  .option('-u, --url <url>', 'simulator base URL', DEFAULT_SIMULATOR_URL)
+  .option('-b, --base <file>', 'scenario file to use as the comparison baseline')
+  .option('--cache-dir <dir>', 'result cache directory', '.plancraft-cache')
+  .option('--no-cache', 'do not read or write the result cache')
+  .action(
+    async (
+      scenarioPaths: string[],
+      opts: {
+        out: string
+        url: string
+        base?: string
+        cacheDir: string
+        cache: boolean
+      },
+    ) => {
+      try {
+        const runs = await runScenarios(scenarioPaths, {
+          url: opts.url,
+          cacheDir: opts.cache ? opts.cacheDir : undefined,
+          onProgress: (message) => console.log(message),
+        })
+        const baseSlug = opts.base
+          ? scenarioSlugOfPath(runs, opts.base)
+          : null
+        const data = getCompareData(runs, { baseSlug })
+        const html = getComparisonHtml(data, {
+          generatedNote:
+            `${runs.length} scenarios | simulator: ${opts.url} | generated ` +
+            new Date().toISOString().slice(0, 10),
+        })
+        fs.writeFileSync(opts.out, html)
+        console.log(`Report: ${opts.out}`)
+        for (const s of data.scenarios)
+          console.log(
+            `  ${s.name}: success ${(s.successProbability * 100).toFixed(1)}%, ` +
+              `median at retirement ${_fmtUsd(s.medianBalanceAtRetirement)}, ` +
+              `median retirement spending ${_fmtUsd(s.medianMonthlySpendingAtRetirement)}/mo`,
+          )
+      } catch (e) {
+        _handleError(e)
+      }
+    },
+  )
+
+const scenarioSlugOfPath = (
+  runs: { scenarioPath: string; compiled: CompiledScenario }[],
+  basePath: string,
+): string | null => {
+  const resolved = path.resolve(basePath)
+  const match = runs.find((r) => path.resolve(r.scenarioPath) === resolved)
+  if (!match) {
+    console.warn(`--base ${basePath} is not among the compared scenarios; ignoring.`)
+    return null
+  }
+  return match.compiled.scenario.meta.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
 
 program
   .command('schema')

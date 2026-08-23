@@ -1,0 +1,18 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "House from portfolio 2031",
+    "description": "Down-payment cash is invested in the portfolio instead of held aside, and the $400k down payment is drawn from the portfolio at purchase in 2031."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "portfolio": { "balance": 865000 },
+  "events": [
+    {
+      "id": "house-down-payment",
+      "label": "House down payment",
+      "kind": "expenseEssential",
+      "amount": { "oneTime": 400000 },
+      "timing": { "at": { "calendarYear": 2031, "month": 6 } }
+    }
+  ]
+}
