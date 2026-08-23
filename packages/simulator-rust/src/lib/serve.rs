@@ -101,7 +101,10 @@ async fn handle_update_daily_market_data_series(
     request: Request<Body>,
 ) -> Response {
     let token = request.headers().get("x-server-to-server-token");
-    if token.is_none() || token.unwrap().to_str().unwrap() != CONFIG.server_to_server_token {
+    if CONFIG.server_to_server_token.is_empty()
+        || token.is_none()
+        || token.unwrap().to_str().unwrap() != CONFIG.server_to_server_token
+    {
         return (StatusCode::UNAUTHORIZED, "Invalid token").into_response();
     }
     let (for_presets_series, vt_and_bnd_series) = get_daily_market_data_series_from_source().await;

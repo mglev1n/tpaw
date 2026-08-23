@@ -13,6 +13,12 @@ crate-type = ["lib"]
 name = "simulator"
 path = "src/main.rs"
 
+[features]
+default = []
+# Link and use the CUDA backend (requires nvcc-built libsimulator-cuda and
+# CUDA runtime libraries). Without it, the pure-Rust CPU backend is used.
+cuda = []
+
 [dependencies]
 sentry = "0.34.0"
 rand = "0.8.5"

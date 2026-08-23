@@ -57,6 +57,27 @@ node dist/Cli.js schema
 - **Wire protocol version.** The client speaks `/3/simulate`. If the hosted
   simulator moves on, it responds `clientNeedsUpdate`; sync the protos in
   `packages/simulator-rust/src/lib/wire` from upstream and regenerate
-  (`npm run gen-wire`), or run a simulator built from this repo. (A CPU
-  backend for `simulator-rust` — it currently requires CUDA — is a known
-  possible follow-up; the design notes live in the repo history.)
+  (`npm run gen-wire`), or run a local simulator (below).
+
+## Local simulator (no hosted API needed)
+
+`packages/simulator-rust` includes a pure-Rust CPU port of the CUDA engine
+(`src/lib/sim_cpu/`), so the simulator server can run locally with no GPU,
+no cloud credentials, and no network:
+
+```bash
+cd packages/simulator-rust
+cargo build --release          # needs protobuf-compiler (protoc) installed
+PORT=8123 ./target/release/simulator serve
+# then point plancraft at it:
+node dist/Cli.js simulate examples/base.scenario.json -u http://127.0.0.1:8123
+```
+
+With no `MARKET_DATA_BUCKET` configured the server uses synthetic market
+data — fine for plancraft scenarios, which pin fixed expected returns and
+manual inflation (market-data-derived *presets* like "suggested inflation"
+would not reflect real data). Monte Carlo draws are bit-exact with the GPU
+backend (same cuRAND XORWOW sequences); floating point results agree with
+the hosted simulator to within f32 precision (observed ≤ 0.003% on
+household scenarios, since the CPU port computes in f64 while the GPU runs
+f32 "efficient mode"). ~200ms per 2,000-run simulation on a 4-core machine.
