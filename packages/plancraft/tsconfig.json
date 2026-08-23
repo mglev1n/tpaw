@@ -8,7 +8,9 @@
     "noImplicitReturns": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
+    // Off to keep the files copied verbatim from packages/web (which does not
+    // set it) compiling unchanged. See src/Engine/UpstreamDrift.test.ts.
+    "noUncheckedIndexedAccess": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
 
