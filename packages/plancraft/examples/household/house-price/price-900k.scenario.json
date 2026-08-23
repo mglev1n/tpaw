@@ -1,0 +1,11 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "$900k house",
+    "description": "Reference price (matches the base assumptions)."
+  },
+  "composition": {
+    "extends": "sweep-base.scenario.json"
+  },
+  "events": []
+}
