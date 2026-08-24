@@ -122,10 +122,17 @@ for (const FLOOR of [0, 10000]) {
 const HOLD = { retire: 'r65', loans: 'standard', housing: 'typical', education: 'two-public' }
 const wy = P.retire.r65 - P.currentAge
 const ry = 95 - P.retire.r65
+// OECD-modified equivalence scale: first adult 1.0, each further adult 0.5,
+// each child 0.3. A working household of four is 2.1 equivalent adults; a
+// retired couple is 1.5. A raw dollar ratio of 1.0 therefore does NOT mean a
+// level standard of living -- the same dollars support far fewer people once
+// the children are gone, so per-person consumption rises sharply.
+const EQ_WORKING = 1.0 + 0.5 + 0.3 + 0.3
+const EQ_RETIRED = 1.0 + 0.5
 console.log(`\n=== Lifestyle creep (retire 65, standard loans, typical house, 2 kids public) ===`)
 console.log(
   `${'variant'.padEnd(10)} ${'consume/yr'.padStart(11)} ${'retire/yr'.padStart(10)} ` +
-    `${'ratio'.padStart(6)} ${'contrib/yr'.padStart(11)} ${'success'.padStart(8)}`,
+    `${'ratio'.padStart(6)} ${'per-equiv'.padStart(10)} ${'contrib/yr'.padStart(11)} ${'success'.padStart(8)}`,
 )
 const t = {}
 for (const vid of Object.keys(P.savings)) {
@@ -140,11 +147,15 @@ for (const vid of Object.keys(P.savings)) {
   const consume = P.netIncome - avgSav
   const retire = r.medianRetirementSpendingPerMonth * 12
   t[vid] = { avgSav, consume, retire }
+  const perEquiv = (retire / EQ_RETIRED) / (consume / EQ_WORKING)
   console.log(
     `${vid.padEnd(10)} ${usd(consume).padStart(11)} ${usd(retire).padStart(10)} ` +
-      `${(retire / consume).toFixed(2).padStart(6)} ${usd(r.contrib).padStart(11)} ` +
-      `${(100 * r.successProbability).toFixed(1).padStart(7)}%`)
+      `${(retire / consume).toFixed(2).padStart(6)} ${perEquiv.toFixed(2).padStart(10)} ` +
+      `${usd(r.contrib).padStart(11)} ${(100 * r.successProbability).toFixed(1).padStart(7)}%`)
 }
+console.log('\nper-equiv: retirement vs working consumption PER EQUIVALENT ADULT.')
+console.log('A raw ratio of 1.00 is not level living: the retired couple is 1.5 equivalent')
+console.log('adults against 2.1 while the children are home, so per-person consumption rises.')
 console.log('\nExchange rate (lifetime retirement dollars per dollar deferred):')
 for (const [lo, hi] of [['moderate', 'high'], ['high', 'hyper'], ['creep', 'high']]) {
   if (!t[lo] || !t[hi]) continue

@@ -1,0 +1,318 @@
+{
+  "plancraftGrid": 1,
+  "name": "Household A: healthcare and the consumption gap",
+  "description": "Two 35-year-olds two years out of training. Household gross ~$410k (physician ~$325k + spouse ~$85k), ~$270,000 net. $150,000 invested. Real income held flat. Isolates how much of the retirement-versus-working consumption gap is explained by healthcare costs the main grid omits. Savings rate is crossed with three healthcare assumptions; every other decision is held at retire 65, standard loans, typical house, two children in public school. Medicare figures follow Fidelity 2026 ($185,500 per individual over retirement, excluding long-term care), modeled as $8,000/yr at 65 growing 2.5%/yr real. The long-term-care line is a rough expected-value allowance, not a sourced estimate. Real 2026 dollars, net of tax.",
+  "base": "base-a.scenario.json",
+  "dimensions": [
+    {
+      "id": "savings",
+      "name": "Savings rate / lifestyle creep",
+      "variants": [
+        {
+          "id": "hyper",
+          "name": "Hyper-saver (41% of net)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 111000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "high",
+          "name": "High (31%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 84000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "moderate",
+          "name": "Moderate (23%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 62000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "creep",
+          "name": "Creeping (31% falling 2%/yr)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 84000
+              },
+              "growth": {
+                "annualPercent": -2.0
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "name": "Retiree healthcare",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No healthcare line (as in the main grid)",
+          "events": []
+        },
+        {
+          "id": "medicare",
+          "name": "Medicare premiums + cost sharing",
+          "events": [
+            {
+              "id": "health",
+              "label": "Medicare premiums and cost sharing",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 8000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "medicare-ltc",
+          "name": "Medicare + long-term care allowance",
+          "events": [
+            {
+              "id": "health",
+              "label": "Medicare premiums and cost sharing",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 8000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ltc",
+              "label": "Long-term care allowance (expected value)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 25000
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 85
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fixed",
+      "name": "Other decisions (held fixed)",
+      "variants": [
+        {
+          "id": "standard",
+          "name": "Retire 65, standard loans, typical house, 2 kids public",
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2600
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "loans",
+              "label": "Student loan payments",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 29000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "housing",
+              "label": "Housing cost above baseline",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 14000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -203,6 +203,78 @@ def education_variants(h):
     return out
 
 
+
+# --- Retiree healthcare, for the consumption-ratio sensitivity ---------------
+# Fidelity's 2026 Retiree Health Care Cost Estimate is $185,500 per 65-year-old
+# individual (~$371,000 per couple) over retirement, covering Medicare premiums,
+# cost sharing and uncovered drugs, and explicitly EXCLUDING long-term care.
+# Modeled as $8,000/yr at 65 growing 2.5%/yr real, which averages ~$11,900/yr
+# over a 30-year retirement and back-loads it the way medical spending actually
+# arrives. The long-term-care line is an expected-value approximation and is far
+# rougher than the Fidelity figure -- flagged as such rather than dressed up.
+HEALTH = collections.OrderedDict([
+    ('none', ('No healthcare line (as in the main grid)', 0, 0)),
+    ('medicare', ('Medicare premiums + cost sharing', 8_000, 0)),
+    ('medicare-ltc', ('Medicare + long-term care allowance', 8_000, 25_000)),
+])
+
+
+def health_variants(h):
+    out = []
+    for vid, (name, med, ltc) in HEALTH.items():
+        events = []
+        if med:
+            events.append(event('health', 'Medicare premiums and cost sharing',
+                                'expenseEssential', {'perYear': med},
+                                {'from': {'named': 'retirement', 'person': 'person1'},
+                                 'to': {'named': 'maxAge', 'person': 'person1'}},
+                                growth=2.5))
+        if ltc:
+            events.append(event('ltc', 'Long-term care allowance (expected value)',
+                                'expenseEssential', {'perYear': ltc},
+                                {'from': {'age': {'person': 'person1', 'years': 85}},
+                                 'to': {'named': 'maxAge', 'person': 'person1'}}))
+        out.append(collections.OrderedDict(
+            [('id', vid), ('name', name), ('events', events)]))
+    return out
+
+
+def build_health_grid(h):
+    k = h['key']
+    fixed_events = (retirement_variants(h)[2]['events']      # retire-65 Social Security
+                    + loan_variants(h)[1]['events']          # standard loans
+                    + housing_variants(h)[1]['events']       # typical house
+                    + education_variants(h)[0]['events'])    # 2 kids, public
+    g = collections.OrderedDict([
+        ('plancraftGrid', 1),
+        ('name', f'Household {h["key"].upper()}: healthcare and the consumption gap'),
+        ('description', (
+            f'{h["blurb"]} Isolates how much of the retirement-versus-working consumption '
+            f'gap is explained by healthcare costs the main grid omits. Savings rate is '
+            f'crossed with three healthcare assumptions; every other decision is held at '
+            f'retire 65, standard loans, typical house, two children in public school. '
+            f'Medicare figures follow Fidelity 2026 ($185,500 per individual over '
+            f'retirement, excluding long-term care), modeled as $8,000/yr at 65 growing '
+            f'2.5%/yr real. The long-term-care line is a rough expected-value allowance, '
+            f'not a sourced estimate. Real 2026 dollars, net of tax.'
+        )),
+        ('base', f'base-{k}.scenario.json'),
+        ('dimensions', [
+            {'id': 'savings', 'name': 'Savings rate / lifestyle creep',
+             'variants': savings_variants(h)},
+            {'id': 'health', 'name': 'Retiree healthcare', 'variants': health_variants(h)},
+            {'id': 'fixed', 'name': 'Other decisions (held fixed)', 'variants': [
+                collections.OrderedDict([
+                    ('id', 'standard'), ('name', 'Retire 65, standard loans, typical house, 2 kids public'),
+                    ('events', fixed_events)])]},
+        ]),
+    ])
+    with open(os.path.join(HERE, f'grid-{k}-health.json'), 'w') as f:
+        json.dump(g, f, indent=2)
+        f.write('\n')
+    print(f'   grid-{k}-health.json: {len(SAVINGS_SHARES)*len(HEALTH)} sims')
+
+
 def build(h):
     k = h['key']
     age = h['current_age']
@@ -330,6 +402,7 @@ def build(h):
 
 for h in HOUSEHOLDS.values():
     build(h)
+    build_health_grid(h)
 
 # Household A previously lived in unsuffixed files; remove them so there is a
 # single naming scheme.
