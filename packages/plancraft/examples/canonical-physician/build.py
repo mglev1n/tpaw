@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
-"""Generate the canonical high-income physician household and its decision grids.
+"""Generate canonical high-income physician households and their decision grids.
 
-This household is deliberately synthetic and representative rather than
-anyone's actual finances, so the resulting effect-size table can be published
-and reasoned about generically. Every figure is stated in real (inflation
-adjusted) 2026 dollars, and every income figure is NET of tax -- the engine
-models one portfolio and takes net contributions, so taxes are handled
-upstream by construction.
+Two deliberately different households, so the effect-size ranking can be
+tested for stability across household type rather than asserted from one case:
 
-Run: python3 build.py   (writes base.scenario.json, grid.json, grid-fees.json)
+  A  Dual income, moderate debt. Two 35-year-olds, ~$410k gross / $270k net,
+     $150k invested, $215k of student loans.
+  B  Single earner, heavy debt. A 38-year-old surgeon out of a long training
+     path, ~$600k gross / $370k net, $50k invested, $400k of student loans,
+     non-earning spouse (so Social Security is a spousal benefit).
+
+Both are synthetic and representative rather than anyone's actual finances.
+Every figure is real 2026 dollars and NET of tax -- the engine models one
+portfolio and takes net contributions, so tax is handled upstream.
+
+The five dimensions are structurally identical across households and the
+savings variants use the same PERCENTAGES of net income, so the comparison
+asks whether the same relative choice carries the same relative weight.
+
+Run: python3 build.py   (writes base/grid/fees/params for each household)
 """
 import collections
 import json
@@ -16,202 +26,79 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ANCHOR = 2026
-
-# ---------------------------------------------------------------------------
-# Household
-# ---------------------------------------------------------------------------
-# Two 35-year-olds, two years out of training. Household gross ~$410k
-# (physician ~$325k + spouse ~$85k); ~$270k net after federal, state and
-# payroll tax. Real income held flat: physician real compensation has been
-# roughly flat over the last two decades, so this avoids flattering the model.
-NET_INCOME = 270_000
-PORTFOLIO_NOW = 150_000
-
-# Savings figures below are NET INVESTABLE SAVINGS BEFORE the explicit
-# obligations modeled as expenses (student loans, incremental housing,
-# education). Present-day discretionary consumption is therefore
-#   NET_INCOME - savings - loans - housing - education
-# which is what the lifestyle-creep trade-off is measured against.
-SAVINGS = {
-    'hyper': ('Hyper-saver (41% of net)', 110_000, 0.0),
-    'high': ('High (31%)', 85_000, 0.0),
-    'moderate': ('Moderate (23%)', 62_000, 0.0),
-    'creep': ('Creeping (31% falling 2%/yr)', 85_000, -2.0),
-}
-
-# Social Security, claimed at 70, scaled down for shorter earnings records at
-# earlier retirement ages. A physician who works to 65 approaches but does not
-# reach 35 years of maximum-taxable earnings.
-SS = {  # retirement age -> (physician $/mo, spouse $/mo)
-    55: (3400, 2100),
-    60: (3800, 2350),
-    65: (4200, 2600),
-    70: (4400, 2700),
-}
-
-# Student loans: ~$215k remaining at 35, 6.5%. Faster payoff costs more per
-# year but far less in total interest.
-LOANS = {
-    'aggressive': ('Aggressive (5 yr)', 48_000, 5),
-    'standard': ('Standard (10 yr)', 29_000, 10),
-    'idr': ('Income-driven (20 yr)', 19_000, 20),
-}
-
-# Housing modeled as the annual cost INCREMENT over a modest house already
-# inside baseline consumption, carried for a 30-year mortgage from 2027.
-HOUSING = {
-    'modest': ('Modest (~$550k)', 0),
-    'typical': ('Typical (~$850k)', 14_000),
-    'doctor': ('Doctor house (~$1.3M)', 30_000),
-}
-
-# Children born 2027 / 2029 / 2031. 529 funding runs birth to 18; private
-# K-12 runs ages 5-18; the college top-up runs ages 18-22 on top of the 529.
-EDUCATION = {
-    'two-public': ('2 kids, public school', 2, False),
-    'two-private': ('2 kids, private K-12 + college', 2, True),
-    'three-public': ('3 kids, public school', 3, False),
-}
 KID_BIRTH = [2027, 2029, 2031]
 FIVE_TWO_NINE_PER_MONTH = 500
-PRIVATE_K12_PER_YEAR = 30_000
 COLLEGE_TOPUP_PER_YEAR = 25_000
 
-
-def event(id_, label, kind, amount, timing, growth=None):
-    e = collections.OrderedDict(
-        [('id', id_), ('label', label), ('kind', kind), ('amount', amount)]
-    )
-    if growth:
-        e['growth'] = {'annualPercent': growth}
-    e['timing'] = timing
-    return e
-
-
-def span(from_year, to_year, from_month=1, to_month=12):
-    return {
-        'from': {'calendarYear': from_year, 'month': from_month},
-        'to': {'calendarYear': to_year, 'month': to_month},
-    }
-
-
-# ---------------------------------------------------------------------------
-# Base scenario
-# ---------------------------------------------------------------------------
-base = collections.OrderedDict([
-    ('plancraft', 1),
-    ('meta', {
-        'name': 'Canonical high-income physician household',
-        'description': (
-            'Synthetic, representative household used to rank financial decisions by '
-            'effect size. Two 35-year-olds, two years out of training; household gross '
-            '~$410k, ~$270,000 net; $150,000 invested; real income held flat. All '
-            'figures are real 2026 dollars, net of tax. Savings, student loans, housing '
-            'and education are grid dimensions.'
-        ),
-        'anchorYear': ANCHOR,
-    }),
-    ('household', {
-        'person1': {'currentAge': {'years': 35}, 'retirementAge': {'years': 65},
-                    'maxAge': {'years': 95}},
-        'person2': {'currentAge': {'years': 35}, 'retirementAge': {'years': 65},
-                    'maxAge': {'years': 95}},
-        'withdrawalStart': 'person1',
-    }),
-    ('portfolio', {'balance': PORTFOLIO_NOW}),
-    # Savings and Social Security are supplied by the grid dimensions, since
-    # both depend on the savings-rate and retirement-age choices.
-    ('events', []),
-    ('simulation', {
-        'expectedReturns': {'fixed': {'stocks': 0.05, 'bonds': 0.02}},
-        'inflation': {'manual': 0.024},
-        'sampling': {'type': 'monteCarlo', 'numRuns': 2000, 'seed': 1776},
-        'legacy': 0,
-    }),
+# Savings variants as a share of net income, identical across households.
+SAVINGS_SHARES = collections.OrderedDict([
+    ('hyper', ('Hyper-saver (41% of net)', 0.41, 0.0)),
+    ('high', ('High (31%)', 0.31, 0.0)),
+    ('moderate', ('Moderate (23%)', 0.23, 0.0)),
+    ('creep', ('Creeping (31% falling 2%/yr)', 0.31, -2.0)),
 ])
 
+HOUSEHOLDS = {
+    'a': dict(
+        key='a',
+        label='Household A - dual income, moderate debt',
+        blurb=('Two 35-year-olds two years out of training. Household gross ~$410k '
+               '(physician ~$325k + spouse ~$85k), ~$270,000 net. $150,000 invested. '
+               'Real income held flat.'),
+        current_age=35,
+        net_income=270_000,
+        portfolio=150_000,
+        # (label, annual payment, years) for ~$215k at 6.5%
+        loans=collections.OrderedDict([
+            ('aggressive', ('Aggressive (5 yr)', 48_000, 5)),
+            ('standard', ('Standard (10 yr)', 29_000, 10)),
+            ('idr', ('Income-driven (20 yr)', 19_000, 20)),
+        ]),
+        housing=collections.OrderedDict([
+            ('modest', ('Modest (~$550k)', 0)),
+            ('typical', ('Typical (~$850k)', 14_000)),
+            ('doctor', ('Doctor house (~$1.3M)', 30_000)),
+        ]),
+        private_k12=30_000,
+        # retirement age -> (person1 $/mo, person2 $/mo), both claimed at 70
+        ss={55: (3400, 2100), 60: (3800, 2350), 65: (4200, 2600), 70: (4400, 2700)},
+        ss_note=('Both spouses earn, so each claims their own benefit at 70, scaled '
+                 'down at earlier retirement ages for the shorter earnings record.'),
+    ),
+    'b': dict(
+        key='b',
+        label='Household B - single earner, heavy debt',
+        blurb=('A 38-year-old surgeon out of a long training path, sole earner. Gross '
+               '~$600k, ~$370,000 net. $50,000 invested -- a late start with a large '
+               'balance outstanding. Real income held flat.'),
+        current_age=38,
+        net_income=370_000,
+        portfolio=50_000,
+        # ~$400k at 6.8%, amortized over each term
+        loans=collections.OrderedDict([
+            ('aggressive', ('Aggressive (5 yr)', 97_000, 5)),
+            ('standard', ('Standard (10 yr)', 56_000, 10)),
+            ('idr', ('Income-driven (20 yr)', 37_000, 20)),
+        ]),
+        housing=collections.OrderedDict([
+            ('modest', ('Modest (~$700k)', 0)),
+            ('typical', ('Typical (~$1.1M)', 20_000)),
+            ('doctor', ('Doctor house (~$1.8M)', 44_000)),
+        ]),
+        private_k12=30_000,
+        # Sole earner maxes the taxable wage base; the spouse takes a spousal
+        # benefit, which earns no delayed-retirement credit past FRA.
+        ss={55: (3600, 1500), 60: (4000, 1650), 65: (4400, 1800), 70: (4600, 1850)},
+        ss_note=('Only one spouse earns, so the second benefit is spousal (roughly half '
+                 'the earner PIA) and takes no delayed-retirement credit.'),
+    ),
+}
 
-def savings_variants():
-    out = []
-    for vid, (name, amount, growth) in SAVINGS.items():
-        out.append(collections.OrderedDict([
-            ('id', vid), ('name', name),
-            ('events', [event(
-                'save', 'Net investable savings', 'savings',
-                {'perYear': amount},
-                {'from': {'named': 'now'},
-                 'to': {'named': 'lastWorkingMonth', 'person': 'person1'}},
-                growth=growth or None,
-            )]),
-        ]))
-    return out
-
-
-def retirement_variants():
-    out = []
-    for age, (phys, spouse) in SS.items():
-        out.append(collections.OrderedDict([
-            ('id', f'r{age}'), ('name', f'Retire at {age}'),
-            ('household', {'person1': {'retirementAge': {'years': age}},
-                           'person2': {'retirementAge': {'years': age}}}),
-            ('events', [
-                event('ss-1', 'Social Security (physician, at 70)', 'retirementIncome',
-                      {'perMonth': phys},
-                      {'from': {'age': {'person': 'person1', 'years': 70}},
-                       'to': {'named': 'maxAge', 'person': 'person1'}}),
-                event('ss-2', 'Social Security (spouse, at 70)', 'retirementIncome',
-                      {'perMonth': spouse},
-                      {'from': {'age': {'person': 'person2', 'years': 70}},
-                       'to': {'named': 'maxAge', 'person': 'person2'}}),
-            ]),
-        ]))
-    return out
-
-
-def loan_variants():
-    return [collections.OrderedDict([
-        ('id', vid), ('name', name),
-        ('events', [event('loans', 'Student loan payments', 'expenseEssential',
-                          {'perYear': per_year},
-                          span(ANCHOR, ANCHOR + years - 1))]),
-    ]) for vid, (name, per_year, years) in LOANS.items()]
-
-
-def housing_variants():
-    out = []
-    for vid, (name, increment) in HOUSING.items():
-        events = []
-        if increment:
-            events.append(event('housing', 'Housing cost above baseline',
-                                'expenseEssential', {'perYear': increment},
-                                span(2027, 2056)))
-        out.append(collections.OrderedDict([('id', vid), ('name', name),
-                                            ('events', events)]))
-    return out
-
-
-def education_variants():
-    out = []
-    for vid, (name, n_kids, private) in EDUCATION.items():
-        events = []
-        for i in range(n_kids):
-            born = KID_BIRTH[i]
-            events.append(event(
-                f'c529-{i+1}', f'529 (child {i+1})', 'expenseEssential',
-                {'perMonth': FIVE_TWO_NINE_PER_MONTH}, span(born, born + 18)))
-            if private:
-                events.append(event(
-                    f'k12-{i+1}', f'Private K-12 (child {i+1})', 'expenseEssential',
-                    {'perYear': PRIVATE_K12_PER_YEAR},
-                    span(born + 5, born + 18, from_month=9, to_month=6)))
-                events.append(event(
-                    f'college-{i+1}', f'College top-up (child {i+1})',
-                    'expenseEssential', {'perYear': COLLEGE_TOPUP_PER_YEAR},
-                    span(born + 18, born + 22, from_month=9, to_month=6)))
-        out.append(collections.OrderedDict([('id', vid), ('name', name),
-                                            ('events', events)]))
-    return out
-
+EDUCATION = collections.OrderedDict([
+    ('two-public', ('2 kids, public school', 2, False)),
+    ('two-private', ('2 kids, private K-12 + college', 2, True)),
+    ('three-public', ('3 kids, public school', 3, False)),
+])
 
 CONDITIONS = [
     {'id': 'pessimistic', 'name': 'Pessimistic (3.5%/1.5%)',
@@ -222,103 +109,232 @@ CONDITIONS = [
      'simulation': {'expectedReturns': {'fixed': {'stocks': 0.065, 'bonds': 0.03}}}},
 ]
 
-grid = collections.OrderedDict([
-    ('plancraftGrid', 1),
-    ('name', 'Canonical physician household: what actually moves the needle'),
-    ('description', (
-        'Ranks five recurring high-income-household decisions by their effect on '
-        'retirement living standard, for a synthetic two-physician-income household '
-        '(both 35, ~$270,000 net, $150,000 invested, real income flat). Savings figures '
-        'are net investable savings before the student loan, housing and education '
-        'obligations modeled here as essential expenses, so present-day discretionary '
-        'consumption is $270,000 minus savings minus those obligations. Social Security '
-        'is claimed at 70 and scaled down at earlier retirement ages for the shorter '
-        'earnings record. Children are born 2027/2029/2031; 529 funding runs birth to '
-        '18, private K-12 ages 5-18, the college top-up ages 18-22. Housing is modeled '
-        'as the annual cost increment over a modest house, carried on a 30-year '
-        'mortgage from 2027. The reported metric is median first-year general '
-        '(lifestyle) retirement spending, which excludes earmarked essential expenses, '
-        'so a dimension only moves it by changing what is left over. Investment costs '
-        'are handled in the companion grid-fees.json, because fee drag is expressed as '
-        'a return reduction and would collide with the return conditions here. All '
-        'figures real 2026 dollars, net of tax; the household is representative rather '
-        'than anyone actual.'
-    )),
-    ('base', 'base.scenario.json'),
-    ('dimensions', [
+FEES = collections.OrderedDict([
+    ('diy', ('DIY index (0.05%)', 0.0495, 0.0195)),
+    ('lowcost', ('Low-cost advisor (0.40%)', 0.046, 0.016)),
+    ('typical', ('Typical AUM (0.75%)', 0.0425, 0.0125)),
+    ('full', ('Full-service AUM (1.10%)', 0.039, 0.009)),
+])
+
+
+def event(id_, label, kind, amount, timing, growth=None):
+    e = collections.OrderedDict(
+        [('id', id_), ('label', label), ('kind', kind), ('amount', amount)])
+    if growth:
+        e['growth'] = {'annualPercent': growth}
+    e['timing'] = timing
+    return e
+
+
+def span(a, b, from_month=1, to_month=12):
+    return {'from': {'calendarYear': a, 'month': from_month},
+            'to': {'calendarYear': b, 'month': to_month}}
+
+
+def savings_variants(h):
+    out = []
+    for vid, (name, share, growth) in SAVINGS_SHARES.items():
+        amount = int(round(h['net_income'] * share, -3))
+        out.append(collections.OrderedDict([
+            ('id', vid), ('name', name),
+            ('events', [event('save', 'Net investable savings', 'savings',
+                              {'perYear': amount},
+                              {'from': {'named': 'now'},
+                               'to': {'named': 'lastWorkingMonth', 'person': 'person1'}},
+                              growth=growth or None)]),
+        ]))
+    return out
+
+
+def retirement_variants(h):
+    return [collections.OrderedDict([
+        ('id', f'r{age}'), ('name', f'Retire at {age}'),
+        ('household', {'person1': {'retirementAge': {'years': age}},
+                       'person2': {'retirementAge': {'years': age}}}),
+        ('events', [
+            event('ss-1', 'Social Security (earner, at 70)', 'retirementIncome',
+                  {'perMonth': p1},
+                  {'from': {'age': {'person': 'person1', 'years': 70}},
+                   'to': {'named': 'maxAge', 'person': 'person1'}}),
+            event('ss-2', 'Social Security (spouse)', 'retirementIncome',
+                  {'perMonth': p2},
+                  {'from': {'age': {'person': 'person2', 'years': 70}},
+                   'to': {'named': 'maxAge', 'person': 'person2'}}),
+        ]),
+    ]) for age, (p1, p2) in h['ss'].items()]
+
+
+def loan_variants(h):
+    return [collections.OrderedDict([
+        ('id', vid), ('name', name),
+        ('events', [event('loans', 'Student loan payments', 'expenseEssential',
+                          {'perYear': per_year}, span(ANCHOR, ANCHOR + years - 1))]),
+    ]) for vid, (name, per_year, years) in h['loans'].items()]
+
+
+def housing_variants(h):
+    out = []
+    for vid, (name, inc) in h['housing'].items():
+        events = [event('housing', 'Housing cost above baseline', 'expenseEssential',
+                        {'perYear': inc}, span(2027, 2056))] if inc else []
+        out.append(collections.OrderedDict(
+            [('id', vid), ('name', name), ('events', events)]))
+    return out
+
+
+def education_variants(h):
+    out = []
+    for vid, (name, n_kids, private) in EDUCATION.items():
+        events = []
+        for i in range(n_kids):
+            b = KID_BIRTH[i]
+            events.append(event(f'c529-{i+1}', f'529 (child {i+1})', 'expenseEssential',
+                                {'perMonth': FIVE_TWO_NINE_PER_MONTH}, span(b, b + 18)))
+            if private:
+                events.append(event(f'k12-{i+1}', f'Private K-12 (child {i+1})',
+                                    'expenseEssential', {'perYear': h['private_k12']},
+                                    span(b + 5, b + 18, 9, 6)))
+                events.append(event(f'college-{i+1}', f'College top-up (child {i+1})',
+                                    'expenseEssential',
+                                    {'perYear': COLLEGE_TOPUP_PER_YEAR},
+                                    span(b + 18, b + 22, 9, 6)))
+        out.append(collections.OrderedDict(
+            [('id', vid), ('name', name), ('events', events)]))
+    return out
+
+
+def build(h):
+    k = h['key']
+    age = h['current_age']
+    base = collections.OrderedDict([
+        ('plancraft', 1),
+        ('meta', {
+            'name': h['label'],
+            'description': (h['blurb'] + ' All figures are real 2026 dollars, net of '
+                            'tax. Savings, student loans, housing and education are '
+                            'grid dimensions.'),
+            'anchorYear': ANCHOR,
+        }),
+        ('household', {
+            'person1': {'currentAge': {'years': age}, 'retirementAge': {'years': 65},
+                        'maxAge': {'years': 95}},
+            'person2': {'currentAge': {'years': age}, 'retirementAge': {'years': 65},
+                        'maxAge': {'years': 95}},
+            'withdrawalStart': 'person1',
+        }),
+        ('portfolio', {'balance': h['portfolio']}),
+        ('events', []),
+        ('simulation', {
+            'expectedReturns': {'fixed': {'stocks': 0.05, 'bonds': 0.02}},
+            'inflation': {'manual': 0.024},
+            'sampling': {'type': 'monteCarlo', 'numRuns': 2000, 'seed': 1776},
+            'legacy': 0,
+        }),
+    ])
+
+    dims = [
         {'id': 'savings', 'name': 'Savings rate / lifestyle creep',
-         'variants': savings_variants()},
-        {'id': 'retire', 'name': 'Retirement age', 'variants': retirement_variants()},
-        {'id': 'loans', 'name': 'Student loan payoff', 'variants': loan_variants()},
-        {'id': 'housing', 'name': 'House size', 'variants': housing_variants()},
+         'variants': savings_variants(h)},
+        {'id': 'retire', 'name': 'Retirement age', 'variants': retirement_variants(h)},
+        {'id': 'loans', 'name': 'Student loan payoff', 'variants': loan_variants(h)},
+        {'id': 'housing', 'name': 'House size', 'variants': housing_variants(h)},
         {'id': 'education', 'name': 'Children and schooling',
-         'variants': education_variants()},
-    ]),
-    ('conditions', CONDITIONS),
-])
+         'variants': education_variants(h)},
+    ]
+    grid = collections.OrderedDict([
+        ('plancraftGrid', 1),
+        ('name', f'{h["label"]}: what actually moves the needle'),
+        ('description', (
+            f'{h["blurb"]} Ranks five recurring decisions by their effect on retirement '
+            f'living standard. Savings figures are net investable savings before the '
+            f'student loan, housing and education obligations modeled here as essential '
+            f'expenses, so present-day discretionary consumption is net income minus '
+            f'savings. {h["ss_note"]} Children are born 2027/2029/2031; 529 funding runs '
+            f'birth to 18, private K-12 ages 5-18, the college top-up ages 18-22. '
+            f'Housing is the annual cost increment over a modest house on a 30-year '
+            f'mortgage from 2027. The metric is median first-year general (lifestyle) '
+            f'retirement spending, which excludes earmarked essential expenses. '
+            f'Investment costs live in the companion fees grid, because fee drag is a '
+            f'return reduction and would collide with the return conditions. Because '
+            f'house, schooling and loan payments compete with savings for the same net '
+            f'income, some combinations are budget-infeasible; analyze.js reports '
+            f'matched effect sizes over the feasible region. Real 2026 dollars, net of '
+            f'tax; representative rather than anyone actual.'
+        )),
+        ('base', f'base-{k}.scenario.json'),
+        ('dimensions', dims),
+        ('conditions', CONDITIONS),
+    ])
 
-# ---------------------------------------------------------------------------
-# Companion grid: investment costs.
-# ---------------------------------------------------------------------------
-# Fee drag is a permanent reduction in realized return, so it is expressed
-# through expectedReturns -- which is also how the return conditions are
-# expressed. Running it as its own grid at a single return environment keeps
-# the two from overwriting each other.
-FEES = {
-    'diy': ('DIY index (0.05%)', 0.0495, 0.0195),
-    'lowcost': ('Low-cost advisor (0.40%)', 0.046, 0.016),
-    'typical': ('Typical AUM (0.75%)', 0.0425, 0.0125),
-    'full': ('Full-service AUM (1.10%)', 0.039, 0.009),
-}
+    fee_grid = collections.OrderedDict([
+        ('plancraftGrid', 1),
+        ('name', f'{h["label"]}: the cost of investment costs'),
+        ('description', (
+            f'Companion isolating fee drag for {h["label"]}, modeled as a permanent '
+            f'reduction in expected return (5.0%/2.0% gross less the stated fee). '
+            f'Crossed against savings rate and retirement age so the fee effect reads '
+            f'against the two decisions known to dominate. Other decisions held at '
+            f'standard loans, typical house, two children in public school.'
+        )),
+        ('base', f'base-{k}.scenario.json'),
+        ('dimensions', [
+            {'id': 'fees', 'name': 'Investment costs', 'variants': [
+                collections.OrderedDict([
+                    ('id', vid), ('name', name),
+                    ('simulation', {'expectedReturns': {'fixed': {'stocks': s, 'bonds': b}}}),
+                ]) for vid, (name, s, b) in FEES.items()]},
+            {'id': 'savings', 'name': 'Savings rate / lifestyle creep',
+             'variants': savings_variants(h)},
+            {'id': 'retire', 'name': 'Retirement age', 'variants': retirement_variants(h)},
+            {'id': 'fixed', 'name': 'Other decisions (held fixed)', 'variants': [
+                collections.OrderedDict([
+                    ('id', 'standard'),
+                    ('name', 'Standard loans, typical house, 2 kids public'),
+                    ('events', loan_variants(h)[1]['events']
+                               + housing_variants(h)[1]['events']
+                               + education_variants(h)[0]['events']),
+                ])]},
+        ]),
+    ])
 
-fee_grid = collections.OrderedDict([
-    ('plancraftGrid', 1),
-    ('name', 'Canonical physician household: the cost of investment costs'),
-    ('description', (
-        'Companion to grid.json isolating fee drag, which is modeled as a permanent '
-        'reduction in expected return (5.0%/2.0% gross less the stated fee). Crossed '
-        'against savings rate and retirement age so the fee effect can be read against '
-        'the two decisions already known to dominate. Same canonical household; other '
-        'decisions held at standard loans, typical house, two children in public '
-        'school. Real 2026 dollars, net of tax.'
-    )),
-    ('base', 'base.scenario.json'),
-    ('dimensions', [
-        {'id': 'fees', 'name': 'Investment costs', 'variants': [
-            collections.OrderedDict([
-                ('id', vid), ('name', name),
-                ('simulation', {'expectedReturns':
-                                {'fixed': {'stocks': s, 'bonds': b}}}),
-            ]) for vid, (name, s, b) in FEES.items()]},
-        {'id': 'savings', 'name': 'Savings rate / lifestyle creep',
-         'variants': savings_variants()},
-        {'id': 'retire', 'name': 'Retirement age', 'variants': retirement_variants()},
-        # Held fixed so the fee effect is read cleanly.
-        {'id': 'fixed', 'name': 'Other decisions (held fixed)', 'variants': [
-            collections.OrderedDict([
-                ('id', 'standard'), ('name', 'Standard loans, typical house, 2 kids public'),
-                ('events', loan_variants()[1]['events']
-                           + housing_variants()[1]['events']
-                           + education_variants()[0]['events']),
-            ])]},
-    ]),
-])
+    # Constants analyze.js needs to reconstruct the budget constraint.
+    params = collections.OrderedDict([
+        ('key', k), ('label', h['label']),
+        ('currentAge', age), ('netIncome', h['net_income']),
+        ('portfolio', h['portfolio']),
+        ('savings', {vid: [int(round(h['net_income'] * share, -3)), growth]
+                     for vid, (_, share, growth) in SAVINGS_SHARES.items()}),
+        ('loans', {vid: [py, yrs] for vid, (_, py, yrs) in h['loans'].items()}),
+        ('housing', {vid: inc for vid, (_, inc) in h['housing'].items()}),
+        ('education', {vid: [n, priv] for vid, (_, n, priv) in EDUCATION.items()}),
+        ('retire', {f'r{a}': a for a in h['ss']}),
+        ('kidBirth', KID_BIRTH), ('fivetwonine', FIVE_TWO_NINE_PER_MONTH * 12),
+        ('privateK12', h['private_k12']), ('collegeTopUp', COLLEGE_TOPUP_PER_YEAR),
+    ])
 
-for name, obj in [('base.scenario.json', base), ('grid.json', grid),
-                  ('grid-fees.json', fee_grid)]:
-    path = os.path.join(HERE, name)
-    with open(path, 'w') as f:
-        json.dump(obj, f, indent=2)
-        f.write('\n')
-    print(f'wrote {name}')
+    for name, obj in [(f'base-{k}.scenario.json', base), (f'grid-{k}.json', grid),
+                      (f'grid-{k}-fees.json', fee_grid), (f'params-{k}.json', params)]:
+        with open(os.path.join(HERE, name), 'w') as f:
+            json.dump(obj, f, indent=2)
+            f.write('\n')
+    n = 1
+    for d in dims:
+        n *= len(d['variants'])
+    print(f'{h["label"]}')
+    print(f'   net ${h["net_income"]:,}  portfolio ${h["portfolio"]:,}  age {age}')
+    print(f'   savings variants: ' + ', '.join(
+        f'{v}=${int(round(h["net_income"]*s, -3)):,}' for v, (_, s, _g) in SAVINGS_SHARES.items()))
+    print(f'   grid-{k}.json: {n} combos x {len(CONDITIONS)} = {n*len(CONDITIONS)} sims')
+    print(f'   description chars: {len(grid["description"])}\n')
 
-n = 1
-for d in grid['dimensions']:
-    n *= len(d['variants'])
-print(f'grid.json:      {n} combos x {len(CONDITIONS)} conditions = {n*len(CONDITIONS)} sims')
-m = 1
-for d in fee_grid['dimensions']:
-    m *= len(d['variants'])
-print(f'grid-fees.json: {m} combos x 1 condition = {m} sims')
-print(f"description lengths: grid {len(grid['description'])}, "
-      f"fees {len(fee_grid['description'])}")
+
+for h in HOUSEHOLDS.values():
+    build(h)
+
+# Household A previously lived in unsuffixed files; remove them so there is a
+# single naming scheme.
+for stale in ['base.scenario.json', 'grid.json', 'grid-fees.json']:
+    p = os.path.join(HERE, stale)
+    if os.path.exists(p):
+        os.remove(p)
+        print(f'removed stale {stale}')

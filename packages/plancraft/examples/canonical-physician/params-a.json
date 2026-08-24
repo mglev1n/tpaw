@@ -1,0 +1,72 @@
+{
+  "key": "a",
+  "label": "Household A - dual income, moderate debt",
+  "currentAge": 35,
+  "netIncome": 270000,
+  "portfolio": 150000,
+  "savings": {
+    "hyper": [
+      111000,
+      0.0
+    ],
+    "high": [
+      84000,
+      0.0
+    ],
+    "moderate": [
+      62000,
+      0.0
+    ],
+    "creep": [
+      84000,
+      -2.0
+    ]
+  },
+  "loans": {
+    "aggressive": [
+      48000,
+      5
+    ],
+    "standard": [
+      29000,
+      10
+    ],
+    "idr": [
+      19000,
+      20
+    ]
+  },
+  "housing": {
+    "modest": 0,
+    "typical": 14000,
+    "doctor": 30000
+  },
+  "education": {
+    "two-public": [
+      2,
+      false
+    ],
+    "two-private": [
+      2,
+      true
+    ],
+    "three-public": [
+      3,
+      false
+    ]
+  },
+  "retire": {
+    "r55": 55,
+    "r60": 60,
+    "r65": 65,
+    "r70": 70
+  },
+  "kidBirth": [
+    2027,
+    2029,
+    2031
+  ],
+  "fivetwonine": 6000,
+  "privateK12": 30000,
+  "collegeTopUp": 25000
+}
