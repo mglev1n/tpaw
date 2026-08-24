@@ -1,7 +1,7 @@
 {
   "plancraftGrid": 1,
-  "name": "Retirement decision grid v3",
-  "description": "Corrected FERS (7/8 VA appointment, service from 2023, high-3 = FTE base+market $275k per 38 USC 7431(f); deferred annuities payable at 60 with 20+ yrs / 62 with 10-19 yrs, deflated 2.4%/yr from separation) plus Social Security claimed at 70 for both spouses. Simone's benefit reflects her later US career start (~2022): $4,100/mo real if she works to 60, $2,700/mo if she stops in 2038; her own benefit beats the spousal top-up in both patterns. Michael's SS varies with retirement age ($3,900-$5,100/mo). Disability: income stops 2033; DI nets $25k/yr savings then $180k/yr to 65; FERS $1,278/mo from 62; SS $2,900/mo from 70. New in v3: college top-up dimension - out-of-pocket college costs beyond the 529 ($1,300/mo/child birth-18 assumed to cover a baseline), at $0 / $25k / $50k per year per child in real dollars over each child's college years (child 1: Sep 2045 - Jun 2049; child 2: Sep 2047 - Jun 2051), modeled as essential expenses so they hit legacy and lifestyle spending, not the spending metric itself. Base otherwise unchanged: house June 2027, 2 kids, savings +2.5%/yr real, PA. SS amounts are scheduled-benefit estimates; trust-fund shortfall (~20% cut in the 2030s absent reform) is not modeled.",
+  "name": "Retirement decision grid v4",
+  "description": "FERS: 7/8 VA appointment, service from 2023, high-3 = FTE base+market $275k per 38 USC 7431(f). Social Security claimed at 70 for both; Simone's later US career start (~2022) gives $4,100/mo real if she works to 60, $2,700/mo if she stops in 2038. Michael's SS $3,900-$5,100/mo by retirement age. Disability: income stops 2033, DI nets $25k/yr savings then $180k/yr to 65, FERS $1,278/mo from 62, SS $2,900/mo from 70. Base: house June 2027, 2 kids, savings +2.5%/yr real, PA. COLLEGE (v3): out-of-pocket beyond the 529 ($1,300/mo/child birth-18), at $0/$25k/$50k per year per child over each child's college years (2045-49 and 2047-51), as essential expenses. HEALTH COVERAGE (v4): Michael's MRA is 57, so separating at 50 (16 yrs service) or 55 (21 yrs) allows only a DEFERRED annuity, which permanently forfeits FEHB; retiring at 60 (26 yrs) or 65 earns an immediate unreduced annuity and keeps it. The four early-retirement patterns carry an unsubsidized-coverage bridge from the year neither spouse has employer coverage until Michael turns 65 in 2054: M50/spouse-stops-2038 runs 2039-2054 (15 yrs, $28k/yr), M55/spouse-stops-2038 2044-2054 (10 yrs, $33k/yr), both spouse-to-60 patterns 2048-2054 (6 yrs, $21k/yr). Amounts are INCREMENTAL over what FEHB would have cost (~$10.5k/yr all-in), isolating the FEHB-loss penalty rather than double-counting coverage the other branches also buy. Built from the Philadelphia 2026 gold index rate (~$315/mo at age 21) x federal age factors at each window's midpoint, plus out-of-pocket, uplifted ~1.5%/yr for real medical inflation. Unsubsidized is correct: enhanced premium tax credits expired 31 Dec 2025 and the 400% FPL cliff is back ($84,600 MAGI for a couple). Unmodeled levers: managing MAGI under the cliff, and a VA early-out (VERA), which would grant an immediate annuity at M55 and preserve FEHB. SS amounts are scheduled benefits; the trust-fund shortfall is not modeled.",
   "base": "../grid/grid-base.scenario.json",
   "dimensions": [
     {
@@ -48,7 +48,7 @@
       "variants": [
         {
           "id": "m50-works60",
-          "name": "M50 · spouse to 60",
+          "name": "M50 \u00b7 spouse to 60",
           "household": {
             "person1": {
               "retirementAge": {
@@ -158,12 +158,30 @@
                   "month": 12
                 }
               }
+            },
+            {
+              "id": "hc-bridge",
+              "label": "Health coverage bridge (FEHB forfeited on deferred retirement)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 21000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2054,
+                  "month": 6
+                }
+              }
             }
           ]
         },
         {
           "id": "m50-stops2038",
-          "name": "M50 · spouse stops 2038",
+          "name": "M50 \u00b7 spouse stops 2038",
           "household": {
             "person1": {
               "retirementAge": {
@@ -257,12 +275,30 @@
                   "month": 12
                 }
               }
+            },
+            {
+              "id": "hc-bridge",
+              "label": "Health coverage bridge (FEHB forfeited on deferred retirement)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 28000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2039,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2054,
+                  "month": 6
+                }
+              }
             }
           ]
         },
         {
           "id": "m55-works60",
-          "name": "M55 · spouse to 60",
+          "name": "M55 \u00b7 spouse to 60",
           "household": {
             "person1": {
               "retirementAge": {
@@ -372,12 +408,30 @@
                   "month": 12
                 }
               }
+            },
+            {
+              "id": "hc-bridge",
+              "label": "Health coverage bridge (FEHB forfeited on deferred retirement)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 21000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2054,
+                  "month": 6
+                }
+              }
             }
           ]
         },
         {
           "id": "m55-stops2038",
-          "name": "M55 · spouse stops 2038",
+          "name": "M55 \u00b7 spouse stops 2038",
           "household": {
             "person1": {
               "retirementAge": {
@@ -471,12 +525,30 @@
                   "month": 12
                 }
               }
+            },
+            {
+              "id": "hc-bridge",
+              "label": "Health coverage bridge (FEHB forfeited on deferred retirement)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 33000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2044,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2054,
+                  "month": 6
+                }
+              }
             }
           ]
         },
         {
           "id": "m60-works60",
-          "name": "M60 · spouse to 60",
+          "name": "M60 \u00b7 spouse to 60",
           "household": {
             "person1": {
               "retirementAge": {
@@ -568,7 +640,7 @@
         },
         {
           "id": "m60-stops2038",
-          "name": "M60 · spouse stops 2038",
+          "name": "M60 \u00b7 spouse stops 2038",
           "household": {
             "person1": {
               "retirementAge": {
@@ -665,7 +737,7 @@
         },
         {
           "id": "m65-works60",
-          "name": "M65 · spouse to 60",
+          "name": "M65 \u00b7 spouse to 60",
           "household": {
             "person1": {
               "retirementAge": {
@@ -757,7 +829,7 @@
         },
         {
           "id": "m65-stops2038",
-          "name": "M65 · spouse stops 2038",
+          "name": "M65 \u00b7 spouse stops 2038",
           "household": {
             "person1": {
               "retirementAge": {

@@ -34,6 +34,12 @@ node dist/Cli.js simulate examples/base.scenario.json --out out
 node dist/Cli.js compare examples/household/*.scenario.json \
   --base examples/household/base.scenario.json --out report.html
 
+# Run a decision grid: a static report plus an interactive explorer that
+# filters by decision, re-ranks by metric, and drills into any single
+# combination's trajectory.
+node dist/Cli.js grid examples/household/grid-retirement/grid.json \
+  --out grid-report.html --explorer explorer.html --csv grid.csv
+
 # Print the scenario JSON Schema.
 node dist/Cli.js schema
 ```
