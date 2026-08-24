@@ -1,0 +1,54 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Canonical high-income physician household",
+    "description": "Synthetic, representative household used to rank financial decisions by effect size. Two 35-year-olds, two years out of training; household gross ~$410k, ~$270,000 net; $150,000 invested; real income held flat. All figures are real 2026 dollars, net of tax. Savings, student loans, housing and education are grid dimensions.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 35
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 35
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 150000
+  },
+  "events": [],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}
