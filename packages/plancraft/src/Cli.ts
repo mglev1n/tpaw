@@ -19,6 +19,7 @@ import {
   startOfTodayUtc,
 } from './Batch/RunMatrix'
 import { applyCondition, generateGrid } from './Grid/GenerateGrid'
+import { getGridExplorerHtml } from './Report/GridExplorer'
 import { getGridCsv, getGridHtml, getGridReportData } from './Report/GridReport'
 import { getCompareData } from './Report/CompareData'
 import { getComparisonHtml } from './Report/HtmlReport'
@@ -201,6 +202,10 @@ program
   )
   .argument('<gridFile>', 'grid JSON file')
   .option('-o, --out <file>', 'output HTML file', 'grid-report.html')
+  .option(
+    '--explorer <file>',
+    'also write an interactive explorer (filter, re-rank, drill in)',
+  )
   .option('--csv <file>', 'also write the full results table as CSV')
   .option('-u, --url <url>', 'simulator base URL', DEFAULT_SIMULATOR_URL)
   .option('--cache-dir <dir>', 'result cache directory', '.plancraft-cache')
@@ -212,6 +217,7 @@ program
       gridFile: string,
       opts: {
         out: string
+        explorer?: string
         csv?: string
         url: string
         cacheDir: string
@@ -269,6 +275,10 @@ program
           }),
         )
         console.log(`Report: ${opts.out}`)
+        if (opts.explorer) {
+          fs.writeFileSync(opts.explorer, getGridExplorerHtml(data))
+          console.log(`Explorer: ${opts.explorer}`)
+        }
         if (opts.csv) {
           fs.writeFileSync(opts.csv, getGridCsv(data))
           console.log(`CSV: ${opts.csv}`)

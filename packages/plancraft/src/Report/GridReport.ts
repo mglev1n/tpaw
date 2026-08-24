@@ -1,3 +1,4 @@
+import { block } from '@tpaw/common'
 import _ from 'lodash'
 import { ScenarioRun } from '../Batch/RunMatrix'
 import { GeneratedGrid } from '../Grid/GenerateGrid'
@@ -23,6 +24,14 @@ export type GridComboResult = {
   medianRetirementSpending: number
   medianBalanceAtRetirement: number
   endingBalanceP50: number
+  // Annual-resolution median trajectories for the interactive explorer,
+  // quantized to keep the embedded payload small: balance in $1,000s,
+  // lifestyle spending in $/month. Index 0 is the anchor year.
+  balanceByYear: number[]
+  spendingByYear: number[]
+  // Withdrawal start as a year index into the arrays above. Varies by combo
+  // whenever a dimension moves a retirement age.
+  retireYear: number
 }
 
 export type GridReportData = {
@@ -31,6 +40,14 @@ export type GridReportData = {
   dimensions: { id: string; name: string; variantNames: Record<string, string> }[]
   conditions: { id: string; name: string }[]
   referenceConditionId: string
+  // Timeline for the explorer's x-axis, shared by every combo in the grid.
+  // Retirement year is per-combo (see GridComboResult.retireYear), since
+  // dimensions may move it.
+  timeline: {
+    anchorYear: number
+    person1AgeAtAnchor: number
+    numYears: number
+  }
   results: GridComboResult[]
   // dimension -> variant -> condition -> mean spending
   mainEffects: {
@@ -83,6 +100,11 @@ export const getGridReportData = (
     // retirement) as spending and invert cost comparisons.
     const spending = _medianSeries(outcome.withdrawalsRegular)
     const balance = _medianSeries(outcome.balanceStart)
+    // Sample one point per 12 months (January of each anchor-relative year).
+    const byYear = (series: number[], scale: number) =>
+      _.range(0, Math.ceil(series.length / 12)).map((y) =>
+        Math.round((series[y * 12] ?? 0) * scale),
+      )
     return {
       conditionId: condition.id,
       cells: combo.cells,
@@ -94,6 +116,9 @@ export const getGridReportData = (
       endingBalanceP50:
         outcome.endingBalanceByPercentile.find((x) => x.percentile === 50)
           ?.balance ?? 0,
+      balanceByYear: byYear(balance, 1 / 1000),
+      spendingByYear: byYear(spending, 1),
+      retireYear: Math.floor(wsMFN / 12),
     }
   })
 
@@ -158,6 +183,16 @@ export const getGridReportData = (
     })),
     conditions: conditions.map((c) => ({ id: c.id, name: c.name })),
     referenceConditionId,
+    timeline: block(() => {
+      const { compiled } = runs[0]!
+      return {
+        anchorYear: compiled.anchor.year,
+        person1AgeAtAnchor: Math.floor(
+          compiled.ages.person1.currentAgeMonths / 12,
+        ),
+        numYears: Math.max(...results.map((r) => r.balanceByYear.length)),
+      }
+    }),
     results,
     mainEffects,
     rankStability,
