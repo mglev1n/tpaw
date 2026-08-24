@@ -26,11 +26,85 @@ pub struct DownloadedData {
 
 
 pub async fn dowload_data() ->  DownloadedData {
+    if let Ok(dir) = std::env::var("MARKET_DATA_LOCAL_DIR") {
+        println!("Loading market data from local directory: {}", dir);
+        return load_local_data(&dir);
+    }
+    if crate::config::CONFIG.market_data_bucket.is_empty() {
+        println!(
+            "MARKET_DATA_BUCKET is not set: using synthetic market data. This is fine for \
+             plans that specify fixed expected returns and manual inflation; market-data \
+             derived presets (suggested inflation, CAPE/yield based expected returns) will \
+             not reflect real market data."
+        );
+        return get_synthetic_data();
+    }
     let (daily_market_data_for_presets_series, vt_and_bnd_series) =
         download_daily_market_data_series().await;
     DownloadedData {
         daily_market_data_for_presets_series,
         vt_and_bnd_series,
+    }
+}
+
+// Loads series previously saved as JSON (the same format stored in GCS):
+// {dir}/daily_market_data_for_presets.json and {dir}/vt_and_bnd.json.
+fn load_local_data(dir: &str) -> DownloadedData {
+    let read = |name: &str| {
+        let path = std::path::Path::new(dir).join(name);
+        std::fs::read_to_string(&path)
+            .unwrap_or_else(|e| panic!("Failed to read {}: {}", path.display(), e))
+    };
+    DownloadedData {
+        daily_market_data_for_presets_series: serde_json::from_str(&read(
+            "daily_market_data_for_presets.json",
+        ))
+        .unwrap(),
+        vt_and_bnd_series: serde_json::from_str(&read("vt_and_bnd.json")).unwrap(),
+    }
+}
+
+fn get_synthetic_data() -> DownloadedData {
+    let now_ms = chrono::Utc::now().timestamp_millis();
+    let start_ms = now_ms - 1000 * 60 * 60 * 24 * 366;
+    let close_times_ms: Vec<i64> =
+        get_conservative_market_closes_between_timestamps_ms(start_ms..=now_ms)
+            .iter()
+            .map(|x| x.timestamp_millis())
+            .collect();
+    DownloadedData {
+        daily_market_data_for_presets_series: close_times_ms
+            .iter()
+            .map(|&x| DailyMarketDataForPresets {
+                closing_time_ms: x,
+                inflation: DailyMarketDataForPresets_Inflation {
+                    closing_time_ms: x,
+                    value: 0.02,
+                },
+                sp500: DailyMarketDataForPresets_SP500 {
+                    closing_time_ms: x,
+                    value: 4000.0,
+                },
+                bond_rates: DailyMarketDataForPresets_BondRates {
+                    closing_time_ms: x,
+                    five_year: 0.017,
+                    seven_year: 0.016,
+                    ten_year: 0.015,
+                    twenty_year: 0.014,
+                    thirty_year: 0.013,
+                },
+            })
+            .collect(),
+        vt_and_bnd_series: close_times_ms
+            .iter()
+            .map(|&x| VTAndBNDData {
+                closing_time_ms: x,
+                percentage_change_from_last_close: VTAndBNDData_PercentageChangeFromLastClose {
+                    vt: 0.0,
+                    bnd: 0.0,
+                },
+            })
+            .collect(),
     }
 }
 

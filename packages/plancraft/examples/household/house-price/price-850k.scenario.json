@@ -1,0 +1,86 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "$850k house",
+    "description": "−$50k vs reference: −$316/mo P&I (nominal, 30y) and −$100/mo tax/ins/maint (real, for life)."
+  },
+  "composition": {
+    "extends": "sweep-base.scenario.json"
+  },
+  "events": [
+    {
+      "id": "mortgage-saving-work",
+      "label": "Lower mortgage P&I vs $900k",
+      "kind": "savings",
+      "nominal": true,
+      "amount": {
+        "perMonth": 316
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "named": "lastWorkingMonth",
+          "person": "person1"
+        }
+      }
+    },
+    {
+      "id": "mortgage-saving-ret",
+      "label": "Lower mortgage P&I (retired)",
+      "kind": "retirementIncome",
+      "nominal": true,
+      "amount": {
+        "perMonth": 316
+      },
+      "timing": {
+        "from": {
+          "named": "retirement",
+          "person": "person1"
+        },
+        "to": {
+          "calendarYear": 2057,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "carry-saving-work",
+      "label": "Lower tax/ins/maint vs $900k",
+      "kind": "savings",
+      "amount": {
+        "perMonth": 100
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "named": "lastWorkingMonth",
+          "person": "person1"
+        }
+      }
+    },
+    {
+      "id": "carry-saving-ret",
+      "label": "Lower tax/ins/maint (retired)",
+      "kind": "retirementIncome",
+      "amount": {
+        "perMonth": 100
+      },
+      "timing": {
+        "from": {
+          "named": "retirement",
+          "person": "person1"
+        },
+        "to": {
+          "named": "maxAge",
+          "person": "person1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Rent indefinitely",
+    "description": "Never buy: the down-payment cash stays invested for life, and the $2,000/mo incremental rent for the larger rental runs from 2027 to end of plan."
+  },
+  "composition": { "extends": "growth-base.scenario.json" },
+  "events": [
+    {
+      "id": "extra-rent",
+      "label": "Incremental rent (for life)",
+      "kind": "expenseEssential",
+      "amount": { "perMonth": 2000 },
+      "timing": { "from": { "calendarYear": 2027, "month": 1 }, "to": { "named": "maxAge", "person": "person1" } }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "$1000k house",
+    "description": "+$100k vs reference: +$632/mo P&I (nominal, 30y) and +$200/mo tax/ins/maint (real, for life)."
+  },
+  "composition": {
+    "extends": "sweep-base.scenario.json"
+  },
+  "events": [
+    {
+      "id": "extra-mortgage",
+      "label": "Extra mortgage P&I vs $900k",
+      "kind": "expenseEssential",
+      "nominal": true,
+      "amount": {
+        "perMonth": 632
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "calendarYear": 2057,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "extra-carry",
+      "label": "Extra tax/ins/maint vs $900k",
+      "kind": "expenseEssential",
+      "amount": {
+        "perMonth": 200
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "named": "maxAge",
+          "person": "person1"
+        }
+      }
+    }
+  ]
+}

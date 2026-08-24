@@ -1,0 +1,15 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Example: retire at 55",
+    "description": "Base but retiring five years earlier."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "household": {
+    "person1": {
+      "currentAge": { "years": 40 },
+      "retirementAge": { "years": 55 },
+      "maxAge": { "years": 95 }
+    }
+  }
+}

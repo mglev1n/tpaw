@@ -1,0 +1,964 @@
+{
+  "plancraftGrid": 1,
+  "name": "Safety-net stress grid",
+  "description": "What if FERS and/or Social Security are not there? Baseline = corrected FERS (7/8, service 2023, base+market high-3) + SS at 70 for both spouses. FERS capped: leave the VA in 2028 with ~5 years of service, taking the ~$53k employee-contribution refund into the portfolio instead of a ~$580/mo deferred annuity (roughly value-equivalent; SS unaffected by leaving the VA). SS eliminated: both benefits zeroed (a ~23% trust-fund-style cut is interpolable between baseline and zero). Fixed: 2 kids public school, $5M legacy, no disability, house June 2027, savings +2.5%/yr real, PA.",
+  "base": "../house-price/sweep-base.scenario.json",
+  "dimensions": [
+    {
+      "id": "career",
+      "name": "Michael's career",
+      "variants": [
+        {
+          "id": "academic",
+          "name": "Academic",
+          "events": []
+        },
+        {
+          "id": "private-practice",
+          "name": "Private practice",
+          "events": [
+            {
+              "id": "save-career-boost",
+              "label": "Private practice income boost",
+              "kind": "savings",
+              "amount": {
+                "perYear": 180000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workpattern",
+      "name": "Retirement / spouse work",
+      "variants": [
+        {
+          "id": "m50-works60",
+          "name": "M50 · spouse to 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 50
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 50, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2414
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2038,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "retinc-spouse",
+              "label": "Spouse net income (Michael retired)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 207400
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2039,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m50-stops2038",
+          "name": "M50 · spouse stops 2038",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 50
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 50
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 50, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2414
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m55-works60",
+          "name": "M55 · spouse to 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 55, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3740
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 60
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4300
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2043,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "retinc-spouse",
+              "label": "Spouse net income (Michael retired)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 234600
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2044,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m55-stops2038",
+          "name": "M55 · spouse stops 2038",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 50
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 55, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3740
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 60
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4300
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m60-works60",
+          "name": "M60 · spouse to 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 60, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5214
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m60-stops2038",
+          "name": "M60 · spouse stops 2038",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 50
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 60, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5214
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m65-works60",
+          "name": "M65 · spouse to 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 65, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 6838
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "m65-stops2038",
+          "name": "M65 · spouse stops 2038",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 50
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "fers-annuity",
+              "label": "FERS annuity (retire 65, 7/8 prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 6838
+              },
+              "timing": {
+                "from": {
+                  "named": "retirement",
+                  "person": "person1"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-michael",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 5100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-simone",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "safetynet",
+      "name": "FERS / Social Security",
+      "variants": [
+        {
+          "id": "both",
+          "name": "FERS + SS as planned",
+          "events": []
+        },
+        {
+          "id": "fers-capped",
+          "name": "FERS capped 5yrs (refund)",
+          "excludeEventIds": [
+            "fers-annuity"
+          ],
+          "events": [
+            {
+              "id": "fers-refund",
+              "label": "FERS contribution refund (leave VA 2028)",
+              "kind": "savings",
+              "amount": {
+                "oneTime": 53000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2028,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "no-ss",
+          "name": "SS eliminated",
+          "excludeEventIds": [
+            "ss-michael",
+            "ss-simone"
+          ],
+          "events": []
+        },
+        {
+          "id": "neither",
+          "name": "FERS capped + SS eliminated",
+          "excludeEventIds": [
+            "fers-annuity",
+            "ss-michael",
+            "ss-simone"
+          ],
+          "events": [
+            {
+              "id": "fers-refund",
+              "label": "FERS contribution refund (leave VA 2028)",
+              "kind": "savings",
+              "amount": {
+                "oneTime": 53000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2028,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "optimistic",
+      "name": "Optimistic (6.5%/3%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.065,
+            "bonds": 0.03
+          }
+        }
+      }
+    }
+  ]
+}

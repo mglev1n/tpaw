@@ -1,0 +1,13 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Floor base",
+    "description": "Sweep base (house 2027, 2 kids public, FERS/SS per work pattern) plus an $8,000/mo real spending floor: basic necessities are funded before any legacy accumulation, so infeasible legacy targets show up as failed runs instead of starved spending."
+  },
+  "composition": {
+    "extends": "../house-price/sweep-base.scenario.json"
+  },
+  "simulation": {
+    "spendingFloor": 8000
+  }
+}

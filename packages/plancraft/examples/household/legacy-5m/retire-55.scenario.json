@@ -1,0 +1,9 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Retire at 55 + $5M legacy",
+    "description": "Both spouses retire at 55 with a $5M bequest target."
+  },
+  "composition": { "extends": "../retire-55.scenario.json" },
+  "simulation": { "legacy": 5000000 }
+}
