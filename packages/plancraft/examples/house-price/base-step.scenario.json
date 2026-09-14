@@ -1,0 +1,72 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "House price with a mid-2028 income step",
+    "description": "Two 37-year-olds, no debt. One attending plus one fellow until Jun 2028, then both attending at $525k or $575k gross. $400,000 invested plus down-payment cash. Real 2026 dollars, net of tax.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 600000.0
+  },
+  "events": [
+    {
+      "id": "save-phase1",
+      "label": "Savings (one attending, one fellow)",
+      "kind": "savings",
+      "amount": {
+        "perYear": 110000
+      },
+      "timing": {
+        "from": {
+          "named": "now"
+        },
+        "to": {
+          "calendarYear": 2028,
+          "month": 6
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}
