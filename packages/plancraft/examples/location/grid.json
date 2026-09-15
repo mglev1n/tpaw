@@ -1,7 +1,7 @@
 {
   "plancraftGrid": 1,
   "name": "Main Line vs Cherry Hill at $500k gross",
-  "description": "Two 37-year-olds, $500,000 gross, BOTH WORKING IN PHILADELPHIA, no student debt, $400,000 invested plus down-payment cash, house bought 2027 with 20% down on a 30-year fixed at 6.5%. Location and house price are one dimension because a Cherry Hill house at a Main Line price is a different house; the $550k Cherry Hill variant is meant to be the same house as the $900k Main Line one. Four effects are modeled separately: house price, property tax (effective rate on market value, higher in NJ on a cheaper house), income tax while working, and income tax in retirement. The working-years comparison turns on an asymmetry -- both spouses pay the Philadelphia non-resident wage tax either way, New Jersey credits that tax against NJ income tax, and Pennsylvania does not credit a local tax against the state tax. The retirement comparison runs the other way, since Pennsylvania exempts 401(k), IRA and pension income entirely while New Jersey taxes it with the retirement-income exclusion fully phased out at this income. Consumption is held equal across locations, so the higher NJ net income during working years is banked. Mortgage principal and interest is nominal and erodes in real terms; carrying costs are real and continue for life.",
+  "description": "Two 37-year-olds, $500,000 gross, BOTH WORKING IN PHILADELPHIA, no student debt, $400,000 invested plus down-payment cash, house bought 2027 with 20% down at 6.5%. House prices are Zillow ZHVI 4-bedroom, July 2026, so the $655k Cherry Hill variant is the same house as the $1.18M Bryn Mawr one; a Cherry Hill house at a Main Line price is a different house, which is why location and price are one dimension. Effective property tax on market value is 1.407% in Lower Merion (Montgomery County has not reassessed since 1998; 47.2727 mills at a 29.76% common level ratio) against 2.699% in Cherry Hill (all-in $4.969/$100 at a 54.32% equalization ratio, including the fire district levy). While working, both spouses pay the 3.425% Philadelphia non-resident wage tax either way; New Jersey credits it in full against NJ income tax while Pennsylvania cannot credit a local tax against the state tax and Lower Merion levies no EIT, so NJ is about $5,750/yr cheaper and that difference is banked. In retirement the sign flips: Pennsylvania exempts retirement income entirely, while New Jersey taxes the portfolio draw -- Social Security is excluded from NJ gross income and the retirement-income exclusion reaches $100,000 below a hard $150,000 cliff, so the NJ penalty is front-loaded before Social Security begins. NJ auto insurance and sales tax premiums are carried for life.",
   "base": "base.scenario.json",
   "dimensions": [
     {
@@ -9,15 +9,15 @@
       "name": "Location and house",
       "variants": [
         {
-          "id": "ml-900",
-          "name": "Main Line, $900k",
+          "id": "ml-brynmawr",
+          "name": "Bryn Mawr $1.18M",
           "events": [
             {
               "id": "house-down",
               "label": "Down payment (20%)",
               "kind": "expenseEssential",
               "amount": {
-                "oneTime": 180000
+                "oneTime": 235989
               },
               "timing": {
                 "at": {
@@ -31,7 +31,7 @@
               "label": "Mortgage principal and interest",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 54611
+                "perYear": 71597
               },
               "nominal": true,
               "timing": {
@@ -50,7 +50,7 @@
               "label": "Property tax, insurance, maintenance",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 29700
+                "perYear": 33121
               },
               "timing": {
                 "from": {
@@ -66,15 +66,15 @@
           ]
         },
         {
-          "id": "ml-1200",
-          "name": "Main Line, $1.2M",
+          "id": "ml-wynnewood",
+          "name": "Wynnewood $1.07M",
           "events": [
             {
               "id": "house-down",
               "label": "Down payment (20%)",
               "kind": "expenseEssential",
               "amount": {
-                "oneTime": 240000
+                "oneTime": 213660
               },
               "timing": {
                 "at": {
@@ -88,7 +88,7 @@
               "label": "Mortgage principal and interest",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 72814
+                "perYear": 64823
               },
               "nominal": true,
               "timing": {
@@ -107,7 +107,7 @@
               "label": "Property tax, insurance, maintenance",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 39600
+                "perYear": 29987
               },
               "timing": {
                 "from": {
@@ -123,15 +123,15 @@
           ]
         },
         {
-          "id": "ch-550",
-          "name": "Cherry Hill, $550k (=ML $900k house)",
+          "id": "ch-08003",
+          "name": "Cherry Hill $655k (= Bryn Mawr house)",
           "events": [
             {
               "id": "house-down",
               "label": "Down payment (20%)",
               "kind": "expenseEssential",
               "amount": {
-                "oneTime": 110000
+                "oneTime": 130918
               },
               "timing": {
                 "at": {
@@ -145,7 +145,7 @@
               "label": "Mortgage principal and interest",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 33373
+                "perYear": 39720
               },
               "nominal": true,
               "timing": {
@@ -164,7 +164,7 @@
               "label": "Property tax, insurance, maintenance",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 22000
+                "perYear": 26832
               },
               "timing": {
                 "from": {
@@ -178,11 +178,11 @@
               }
             },
             {
-              "id": "save-state-diff",
-              "label": "Extra savings from NJ net income",
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
               "kind": "savings",
               "amount": {
-                "perYear": 4742
+                "perYear": 5750
               },
               "timing": {
                 "from": {
@@ -195,16 +195,15 @@
               }
             },
             {
-              "id": "nj-ret-tax",
-              "label": "NJ income tax on retirement withdrawals",
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 4573
+                "perYear": 2625
               },
               "timing": {
                 "from": {
-                  "named": "retirement",
-                  "person": "person1"
+                  "named": "now"
                 },
                 "to": {
                   "named": "maxAge",
@@ -215,15 +214,15 @@
           ]
         },
         {
-          "id": "ch-750",
-          "name": "Cherry Hill, $750k",
+          "id": "ch-08034",
+          "name": "Cherry Hill $572k",
           "events": [
             {
               "id": "house-down",
               "label": "Down payment (20%)",
               "kind": "expenseEssential",
               "amount": {
-                "oneTime": 150000
+                "oneTime": 114481
               },
               "timing": {
                 "at": {
@@ -237,7 +236,7 @@
               "label": "Mortgage principal and interest",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 45509
+                "perYear": 34733
               },
               "nominal": true,
               "timing": {
@@ -256,7 +255,7 @@
               "label": "Property tax, insurance, maintenance",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 30000
+                "perYear": 23463
               },
               "timing": {
                 "from": {
@@ -270,11 +269,11 @@
               }
             },
             {
-              "id": "save-state-diff",
-              "label": "Extra savings from NJ net income",
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
               "kind": "savings",
               "amount": {
-                "perYear": 4742
+                "perYear": 5750
               },
               "timing": {
                 "from": {
@@ -287,16 +286,15 @@
               }
             },
             {
-              "id": "nj-ret-tax",
-              "label": "NJ income tax on retirement withdrawals",
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 4573
+                "perYear": 2625
               },
               "timing": {
                 "from": {
-                  "named": "retirement",
-                  "person": "person1"
+                  "named": "now"
                 },
                 "to": {
                   "named": "maxAge",
@@ -307,15 +305,15 @@
           ]
         },
         {
-          "id": "ch-900",
-          "name": "Cherry Hill, $900k (same spend)",
+          "id": "ch-samespend",
+          "name": "Cherry Hill $1.07M (same spend)",
           "events": [
             {
               "id": "house-down",
               "label": "Down payment (20%)",
               "kind": "expenseEssential",
               "amount": {
-                "oneTime": 180000
+                "oneTime": 213660
               },
               "timing": {
                 "at": {
@@ -329,7 +327,7 @@
               "label": "Mortgage principal and interest",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 54611
+                "perYear": 64823
               },
               "nominal": true,
               "timing": {
@@ -348,7 +346,7 @@
               "label": "Property tax, insurance, maintenance",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 36000
+                "perYear": 43790
               },
               "timing": {
                 "from": {
@@ -362,11 +360,11 @@
               }
             },
             {
-              "id": "save-state-diff",
-              "label": "Extra savings from NJ net income",
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
               "kind": "savings",
               "amount": {
-                "perYear": 4742
+                "perYear": 5750
               },
               "timing": {
                 "from": {
@@ -379,16 +377,15 @@
               }
             },
             {
-              "id": "nj-ret-tax",
-              "label": "NJ income tax on retirement withdrawals",
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
               "kind": "expenseEssential",
               "amount": {
-                "perYear": 4573
+                "perYear": 2625
               },
               "timing": {
                 "from": {
-                  "named": "retirement",
-                  "person": "person1"
+                  "named": "now"
                 },
                 "to": {
                   "named": "maxAge",

@@ -1,24 +1,40 @@
 #!/usr/bin/env python3
 """Main Line (Lower Merion, PA) vs Cherry Hill (NJ) at ~$500k gross.
 
-Four effects pull in different directions and have to be modeled separately or
-the answer is meaningless:
+Four effects, two of which point in OPPOSITE directions -- which is why this
+cannot be answered with a single "state tax rate":
 
-  1. House price      -- the same family home costs far less in Cherry Hill.
-  2. Property tax     -- NJ's effective rate is higher, on a cheaper house.
-  3. Income tax WHILE WORKING -- both spouses work in Philadelphia, so both pay
-     the Philadelphia non-resident wage tax either way. NJ credits that tax
-     against NJ income tax; Pennsylvania does NOT credit a local tax against
-     the state tax. That asymmetry is the whole game during working years.
-  4. Income tax IN RETIREMENT -- Pennsylvania exempts 401(k)/IRA/pension income
-     entirely; New Jersey taxes it, with the retirement-income exclusion fully
-     phased out at this income level.
+  1. House price. A comparable 4-bedroom home costs ~1.8x more on the Main
+     Line (Zillow ZHVI 4BR, Jul 2026: Bryn Mawr $1,179,945 / Wynnewood
+     $1,068,301 / Cherry Hill 08003 $654,591).
+  2. Property tax. Lower Merion's effective rate on MARKET value is only
+     ~1.407% -- Montgomery County has not reassessed since 1998 and the common
+     level ratio is 29.76% against 47.2727 mills. Cherry Hill is ~2.699%
+     (all-in $4.969/$100 at a 54.32% equalization ratio, including the separate
+     fire district levy). So NJ's rate is ~1.9x PA's, on a much cheaper house:
+     at the SAME HOUSE the annual bills nearly cancel, and the difference shows
+     up as ~$500k more capital tied up in the Main Line house instead.
+  3. Income tax WHILE WORKING. Both spouses pay the Philadelphia non-resident
+     wage tax (3.425%) either way. New Jersey credits it in full against NJ
+     income tax; Pennsylvania does not credit a local tax against the state
+     tax, and Lower Merion levies no EIT of its own to credit it against. So
+     PA stacks 3.07% on top with no offset and NJ absorbs it -- NJ is CHEAPER
+     by ~$5,750/yr.
+  4. Income tax IN RETIREMENT. Pennsylvania exempts 401(k)/IRA/pension income
+     entirely. New Jersey taxes it -- but excludes Social Security from NJ
+     gross income, and the retirement-income exclusion is worth up to $100,000
+     below a hard $150,000 cliff. So the NJ penalty depends on the PORTFOLIO
+     DRAW (spending less Social Security), not on total spending, and is
+     front-loaded in the years before Social Security begins.
 
-Effects 3 and 4 point in OPPOSITE directions, which is why this cannot be
-answered with a single "state tax rate".
-
-RATES BLOCK BELOW IS THE ONLY THING THAT NEEDS UPDATING when better figures
-land -- everything else derives from it.
+Because of (4) the NJ retirement tax is endogenous -- it depends on the draw the
+simulation produces -- and the draw is set jointly by the savings rate, the
+retirement age and the house, which are three separate grid dimensions. A
+constant cannot express that, and the exclusion is a step function with a hard
+cliff, so it cannot be averaged either. The grid therefore runs with the
+retirement tax at zero and nj_retirement_tax.py applies it afterwards from the
+measured draws; analyze.py folds that into the paired comparison. The
+NJ_RET_TAX_* constants below stay as a manual override and are normally zero.
 """
 import collections, json, os
 
@@ -29,84 +45,88 @@ GROSS = 500_000
 PORTFOLIO_NOW = 400_000
 MORTGAGE_RATE, MORTGAGE_YEARS, DOWN_PCT = 0.065, 30, 0.20
 
-# ---------------------------------------------------------------------------
-# RATES  (provisional; replace with researched figures)
-# ---------------------------------------------------------------------------
-PHILLY_NONRESIDENT_WAGE = 0.0344   # paid from either state when working in Philly
-PA_STATE = 0.0307
-LOWER_MERION_EIT = 0.0             # credited away by the Philadelphia wage tax
-NJ_MFJ_BRACKETS = [(20_000,.014),(50_000,.0175),(70_000,.0245),(80_000,.035),
-                   (150_000,.05525),(500_000,.0637),(1_000_000,.0897),(10**9,.1075)]
-PROPERTY_TAX = {'pa': 0.019, 'nj': 0.026}     # effective, on MARKET value
+# --- Verified rates (see module docstring for sources) ----------------------
+PHILLY_NONRESIDENT = 0.03425
+PA_STATE, LOWER_MERION_EIT = 0.0307, 0.0
+PROPERTY_TAX = {'pa': 0.01407, 'nj': 0.02699}
 INSURANCE_PCT, MAINTENANCE_PCT = 0.004, 0.010
-# Share of retirement withdrawals coming from tax-deferred accounts; the rest
-# is Roth or already-taxed basis. NJ taxes only the tax-deferred share, and
-# taxes no Social Security at all.
-TAX_DEFERRED_SHARE = 0.70
+NJ_BRACKETS = [(20_000,.014),(50_000,.0175),(70_000,.0245),(80_000,.035),
+               (150_000,.05525),(500_000,.0637),(1_000_000,.0897),(10**9,.1075)]
+NJ_PROP_TAX_DEDUCTION_CAP = 15_000
+# NJ costs more on these regardless of phase.
+NJ_AUTO_INSURANCE_EXTRA = 2_250     # two vehicles, full coverage
+NJ_SALES_TAX_EXTRA = 375            # 0.625 pts on ~$60k taxable consumption
+
+# Set from pass 1. Net of Stay NJ + ANCHOR property tax relief, which is
+# income-tiered and politically fragile -- see NJ_RELIEF note below.
+NJ_RET_TAX_PRE_SS = 0
+NJ_RET_TAX_POST_SS = 0
 
 def nj_tax(taxable):
-    t, prev = 0.0, 0
-    for cap, rate in NJ_MFJ_BRACKETS:
-        if taxable > prev:
-            t += (min(taxable, cap) - prev) * rate
+    out, prev = 0.0, 0
+    for cap, rate in NJ_BRACKETS:
+        if taxable > prev: out += (min(taxable, cap) - prev) * rate
         prev = cap
-    return t
+    return out
 
-def federal_and_payroll(gross, e1, e2):
-    std = 31_500
-    taxable = max(0, gross - std)
+def nj_retirement_tax(draw, age65plus=True, include_relief=True):
+    """NJ tax on an annual portfolio draw, net of property tax relief.
+
+    Social Security is excluded from NJ gross income, so the draw -- not total
+    spending -- is what NJ sees. The exclusion is a step function with a hard
+    cliff at $150,000, not a smooth phase-out."""
+    if draw <= 100_000:   excl = min(draw, 100_000)
+    elif draw <= 125_000: excl = draw * 0.50
+    elif draw <= 150_000: excl = draw * 0.25
+    else:                 excl = 0.0
+    exemptions = 4_000 if age65plus else 2_000
+    tax = nj_tax(max(0, draw - excl - exemptions - NJ_PROP_TAX_DEDUCTION_CAP))
+    if not include_relief:
+        return tax
+    stay = 6_500 if draw <= 100_000 else 5_000 if draw <= 150_000 else 4_000 if draw <= 200_000 else 0
+    anchor = 1_750 if draw <= 150_000 else 1_250 if draw <= 250_000 else 0
+    return tax - stay - anchor
+
+def federal_and_payroll(gross):
+    taxable = max(0, gross - 31_500)
     brk = [(24_000,.10),(97_000,.12),(207_000,.22),(395_000,.24),(502_000,.32),
            (752_000,.35),(10**9,.37)]
     fed, prev = 0.0, 0
     for cap, rate in brk:
         if taxable > prev: fed += (min(taxable, cap) - prev) * rate
         prev = cap
-    WB = 184_000
+    e1, e2, WB = gross*0.55, gross*0.45, 184_000
     payroll = (min(e1,WB)+min(e2,WB))*.062 + gross*.0145 + max(0,gross-250_000)*.009
     return fed, payroll
 
 def working_net(state):
-    """Net income while both spouses work in Philadelphia."""
-    e1, e2 = GROSS*0.55, GROSS*0.45
-    fed, payroll = federal_and_payroll(GROSS, e1, e2)
-    philly = GROSS * PHILLY_NONRESIDENT_WAGE
+    fed, payroll = federal_and_payroll(GROSS)
+    philly = GROSS * PHILLY_NONRESIDENT
     if state == 'pa':
-        # PA taxes residents at the flat rate; the Philadelphia wage tax credits
-        # against the LOCAL earned income tax, not against the state tax.
         state_local = GROSS*PA_STATE + max(0, GROSS*LOWER_MERION_EIT - philly)
     else:
-        # NJ credits tax paid to another jurisdiction, capped at the NJ tax on
-        # that same income -- here all of it is Philadelphia-sourced.
-        gross_nj = nj_tax(GROSS)
-        state_local = max(0, gross_nj - philly)
-    return GROSS - fed - payroll - philly - state_local, dict(
-        fed=fed, payroll=payroll, philly=philly, state_local=state_local)
+        before = nj_tax(GROSS - 2_000 - NJ_PROP_TAX_DEDUCTION_CAP)
+        state_local = max(0, before - philly)   # Philadelphia credit is full here
+    return GROSS - fed - payroll - philly - state_local
 
-def nj_retirement_tax(withdrawals):
-    """NJ tax on retirement withdrawals. Social Security is not taxed by NJ and
-    the retirement-income exclusion is fully phased out above $150k."""
-    return nj_tax(withdrawals * TAX_DEFERRED_SHARE)
+PA_NET, NJ_NET = working_net('pa'), working_net('nj')
 
 def pmt(P):
     r = MORTGAGE_RATE/12; n = MORTGAGE_YEARS*12
     return P*r/(1-(1+r)**-n)*12
 
-# ---------------------------------------------------------------------------
-# Location and house variants. Price and state move together, so they are one
-# dimension -- a Cherry Hill house at a Main Line price is a different house.
-# ---------------------------------------------------------------------------
+# Zillow ZHVI 4-bedroom, July 2026. Price and state move together: a Cherry
+# Hill house at a Main Line price is a different house.
 LOCATIONS = collections.OrderedDict([
-    ('ml-900',   ('Main Line, $900k',        'pa',  900_000)),
-    ('ml-1200',  ('Main Line, $1.2M',        'pa', 1_200_000)),
-    ('ch-550',   ('Cherry Hill, $550k (=ML $900k house)', 'nj', 550_000)),
-    ('ch-750',   ('Cherry Hill, $750k',      'nj',  750_000)),
-    ('ch-900',   ('Cherry Hill, $900k (same spend)', 'nj', 900_000)),
+    ('ml-brynmawr',  ('Bryn Mawr $1.18M',            'pa', 1_179_945)),
+    ('ml-wynnewood', ('Wynnewood $1.07M',            'pa', 1_068_301)),
+    ('ch-08003',     ('Cherry Hill $655k (= Bryn Mawr house)', 'nj', 654_591)),
+    ('ch-08034',     ('Cherry Hill $572k',           'nj',   572_405)),
+    ('ch-samespend', ('Cherry Hill $1.07M (same spend)',      'nj', 1_068_301)),
 ])
-SAVINGS_RATES = collections.OrderedDict([('hi', 0.40), ('mid', 0.31), ('lo', 0.23)])
+SAVINGS_RATES = collections.OrderedDict([('hi',0.40),('mid',0.31),('lo',0.23)])
 RETIRE = [55, 60, 65]
 SS = {55: (3600, 3200), 60: (4000, 3500), 65: (4400, 3800)}
-# First-pass estimate of annual retirement withdrawals, refined after a run.
-ASSUMED_WITHDRAWAL = 190_000
 
 def event(i, label, kind, amount, timing, nominal=False):
     e = collections.OrderedDict([('id',i),('label',label),('kind',kind),('amount',amount)])
@@ -123,72 +143,68 @@ base = collections.OrderedDict([
                               'Philadelphia, no student debt. $400,000 invested plus '
                               'down-payment cash. Real 2026 dollars, net of tax.'),
               'anchorYear': ANCHOR}),
-    ('household', {'person1': {'currentAge':{'years':CURRENT_AGE},'retirementAge':{'years':65},
-                               'maxAge':{'years':MAX_AGE}},
-                   'person2': {'currentAge':{'years':CURRENT_AGE},'retirementAge':{'years':65},
-                               'maxAge':{'years':MAX_AGE}},
-                   'withdrawalStart': 'person1'}),
+    ('household', {'person1':{'currentAge':{'years':CURRENT_AGE},'retirementAge':{'years':65},
+                              'maxAge':{'years':MAX_AGE}},
+                   'person2':{'currentAge':{'years':CURRENT_AGE},'retirementAge':{'years':65},
+                              'maxAge':{'years':MAX_AGE}},
+                   'withdrawalStart':'person1'}),
     ('portfolio', {'balance': PORTFOLIO_NOW + MAX_DOWN}),
     ('events', []),
-    ('simulation', {'expectedReturns': {'fixed': {'stocks':0.05,'bonds':0.02}},
-                    'inflation': {'manual': 0.024},
-                    'sampling': {'type':'monteCarlo','numRuns':2000,'seed':1776},
-                    'legacy': 0}),
+    ('simulation', {'expectedReturns':{'fixed':{'stocks':0.05,'bonds':0.02}},
+                    'inflation':{'manual':0.024},
+                    'sampling':{'type':'monteCarlo','numRuns':2000,'seed':1776},
+                    'legacy':0}),
 ])
-
-PA_NET_EARLY, _ = working_net('pa')
-NJ_NET_EARLY, _ = working_net('nj')
-
 
 def location_variants():
     out = []
-    for vid, (name, state, price) in LOCATIONS.items():
+    for vid,(name,state,price) in LOCATIONS.items():
         down = price*DOWN_PCT
         carry = price*(PROPERTY_TAX[state] + INSURANCE_PCT + MAINTENANCE_PCT)
         evs = [
             event('house-down','Down payment (20%)','expenseEssential',
-                  {'oneTime': round(down)}, {'at':{'calendarYear':BUY_YEAR,'month':6}}),
+                  {'oneTime':round(down)}, {'at':{'calendarYear':BUY_YEAR,'month':6}}),
             event('house-pi','Mortgage principal and interest','expenseEssential',
-                  {'perYear': round(pmt(price-down))},
+                  {'perYear':round(pmt(price-down))},
                   {'from':{'calendarYear':BUY_YEAR,'month':1},
                    'to':{'calendarYear':BUY_YEAR+MORTGAGE_YEARS-1,'month':12}}, nominal=True),
             event('house-carry','Property tax, insurance, maintenance','expenseEssential',
-                  {'perYear': round(carry)},
+                  {'perYear':round(carry)},
                   {'from':{'calendarYear':BUY_YEAR,'month':1},
                    'to':{'named':'maxAge','person':'person1'}}),
         ]
         if state == 'nj':
-            # Consumption is held equal across locations, so NJ's higher net
-            # income during the working years is banked rather than spent.
-            evs.append(event('save-state-diff','Extra savings from NJ net income',
-                             'savings', {'perYear': round(NJ_NET_EARLY - PA_NET_EARLY)},
+            # Consumption is held equal across locations, so NJ's lower income
+            # tax while working is banked rather than spent.
+            evs.append(event('save-nj-tax-edge','Banked NJ income tax advantage','savings',
+                             {'perYear':round(NJ_NET-PA_NET)},
                              {'from':{'named':'now'},
                               'to':{'named':'lastWorkingMonth','person':'person1'}}))
-            # PA exempts retirement income entirely, so this line exists only
-            # for the New Jersey variants.
-            evs.append(event('nj-ret-tax','NJ income tax on retirement withdrawals',
+            evs.append(event('nj-other','NJ auto insurance and sales tax premium',
                              'expenseEssential',
-                             {'perYear': round(nj_retirement_tax(ASSUMED_WITHDRAWAL))},
-                             {'from':{'named':'retirement','person':'person1'},
+                             {'perYear':NJ_AUTO_INSURANCE_EXTRA+NJ_SALES_TAX_EXTRA},
+                             {'from':{'named':'now'},
                               'to':{'named':'maxAge','person':'person1'}}))
+            if NJ_RET_TAX_PRE_SS:
+                evs.append(event('nj-ret-tax-pre','NJ tax on withdrawals, before Social Security',
+                                 'expenseEssential', {'perYear':NJ_RET_TAX_PRE_SS},
+                                 {'from':{'named':'retirement','person':'person1'},
+                                  'to':{'age':{'person':'person1','years':70}}}))
+            if NJ_RET_TAX_POST_SS:
+                evs.append(event('nj-ret-tax-post','NJ tax on withdrawals, with Social Security',
+                                 'expenseEssential', {'perYear':NJ_RET_TAX_POST_SS},
+                                 {'from':{'age':{'person':'person1','years':70}},
+                                  'to':{'named':'maxAge','person':'person1'}}))
         out.append(collections.OrderedDict([('id',vid),('name',name),('events',evs)]))
     return out
 
-# Savings depends on the state (different net income), and the state is set by
-# the location dimension -- so savings is expressed as a RATE and the dollar
-# amount is folded into the location variants would double the dimension. Keep
-# them separate by using the PA net as the reference and charging NJ the
-# difference as an explicit expense, which keeps both dimensions independent.
-PA_NET, PA_PARTS = working_net('pa')
-NJ_NET, NJ_PARTS = working_net('nj')
-
 def savings_dimension():
     return [collections.OrderedDict([
-        ('id', rid), ('name', f'Save {int(rate*100)}% of net (${int(round(PA_NET*rate,-3)):,})'),
-        ('events', [event('save','Net investable savings','savings',
-                          {'perYear': int(round(PA_NET*rate,-3))},
-                          {'from':{'named':'now'},
-                           'to':{'named':'lastWorkingMonth','person':'person1'}})]),
+        ('id',rid), ('name',f'Save {int(rate*100)}% of net (${int(round(PA_NET*rate,-3)):,})'),
+        ('events',[event('save','Net investable savings','savings',
+                         {'perYear':int(round(PA_NET*rate,-3))},
+                         {'from':{'named':'now'},
+                          'to':{'named':'lastWorkingMonth','person':'person1'}})]),
     ]) for rid, rate in SAVINGS_RATES.items()]
 
 grid = collections.OrderedDict([
@@ -196,43 +212,45 @@ grid = collections.OrderedDict([
     ('name', 'Main Line vs Cherry Hill at $500k gross'),
     ('description', (
         'Two 37-year-olds, $500,000 gross, BOTH WORKING IN PHILADELPHIA, no student debt, '
-        '$400,000 invested plus down-payment cash, house bought 2027 with 20% down on a '
-        '30-year fixed at 6.5%. Location and house price are one dimension because a Cherry '
-        'Hill house at a Main Line price is a different house; the $550k Cherry Hill variant '
-        'is meant to be the same house as the $900k Main Line one. Four effects are modeled '
-        'separately: house price, property tax (effective rate on market value, higher in NJ '
-        'on a cheaper house), income tax while working, and income tax in retirement. The '
-        'working-years comparison turns on an asymmetry -- both spouses pay the Philadelphia '
-        'non-resident wage tax either way, New Jersey credits that tax against NJ income tax, '
-        'and Pennsylvania does not credit a local tax against the state tax. The retirement '
-        'comparison runs the other way, since Pennsylvania exempts 401(k), IRA and pension '
-        'income entirely while New Jersey taxes it with the retirement-income exclusion fully '
-        'phased out at this income. Consumption is held equal across locations, so the higher '
-        'NJ net income during working years is banked. Mortgage principal and interest is '
-        'nominal and erodes in real terms; carrying costs are real and continue for life.'
+        '$400,000 invested plus down-payment cash, house bought 2027 with 20% down at 6.5%. '
+        'House prices are Zillow ZHVI 4-bedroom, July 2026, so the $655k Cherry Hill variant '
+        'is the same house as the $1.18M Bryn Mawr one; a Cherry Hill house at a Main Line '
+        'price is a different house, which is why location and price are one dimension. '
+        'Effective property tax on market value is 1.407% in Lower Merion (Montgomery County '
+        'has not reassessed since 1998; 47.2727 mills at a 29.76% common level ratio) against '
+        '2.699% in Cherry Hill (all-in $4.969/$100 at a 54.32% equalization ratio, including '
+        'the fire district levy). While working, both spouses pay the 3.425% Philadelphia '
+        'non-resident wage tax either way; New Jersey credits it in full against NJ income '
+        'tax while Pennsylvania cannot credit a local tax against the state tax and Lower '
+        'Merion levies no EIT, so NJ is about $5,750/yr cheaper and that difference is banked. '
+        'In retirement the sign flips: Pennsylvania exempts retirement income entirely, while '
+        'New Jersey taxes the portfolio draw -- Social Security is excluded from NJ gross '
+        'income and the retirement-income exclusion reaches $100,000 below a hard $150,000 '
+        'cliff, so the NJ penalty is front-loaded before Social Security begins. NJ auto '
+        'insurance and sales tax premiums are carried for life.'
     )),
     ('base', 'base.scenario.json'),
     ('dimensions', [
-        {'id': 'location', 'name': 'Location and house', 'variants': location_variants()},
-        {'id': 'savings', 'name': 'Savings rate', 'variants': savings_dimension()},
-        {'id': 'retire', 'name': 'Retirement age', 'variants': [
+        {'id':'location','name':'Location and house','variants':location_variants()},
+        {'id':'savings','name':'Savings rate','variants':savings_dimension()},
+        {'id':'retire','name':'Retirement age','variants':[
             collections.OrderedDict([
-                ('id', f'r{a}'), ('name', f'Retire at {a}'),
-                ('household', {'person1': {'retirementAge': {'years': a}},
-                               'person2': {'retirementAge': {'years': a}}}),
-                ('events', [
+                ('id',f'r{a}'), ('name',f'Retire at {a}'),
+                ('household',{'person1':{'retirementAge':{'years':a}},
+                              'person2':{'retirementAge':{'years':a}}}),
+                ('events',[
                     event('ss-1','Social Security (person 1, at 70)','retirementIncome',
-                          {'perMonth': SS[a][0]},
+                          {'perMonth':SS[a][0]},
                           {'from':{'age':{'person':'person1','years':70}},
                            'to':{'named':'maxAge','person':'person1'}}),
                     event('ss-2','Social Security (person 2, at 70)','retirementIncome',
-                          {'perMonth': SS[a][1]},
+                          {'perMonth':SS[a][1]},
                           {'from':{'age':{'person':'person2','years':70}},
                            'to':{'named':'maxAge','person':'person2'}}),
                 ]),
             ]) for a in RETIRE]},
     ]),
-    ('conditions', [
+    ('conditions',[
         {'id':'pessimistic','name':'Pessimistic (3.5%/1.5%)',
          'simulation':{'expectedReturns':{'fixed':{'stocks':0.035,'bonds':0.015}}}},
         {'id':'base-returns','name':'Base (5%/2%)',
@@ -242,25 +260,18 @@ grid = collections.OrderedDict([
     ]),
 ])
 
-for _name, _obj in [('base.scenario.json', base), ('grid.json', grid)]:
-    with open(os.path.join(HERE, _name), 'w') as _f:
-        json.dump(_obj, _f, indent=2); _f.write('\n')
+for _n,_o in [('base.scenario.json',base),('grid.json',grid)]:
+    with open(os.path.join(HERE,_n),'w') as f:
+        json.dump(_o,f,indent=2); f.write('\n')
 
 if __name__ == '__main__':
-    print(f"Gross ${GROSS:,}, both working in Philadelphia\n")
-    for st, label in (('pa','Lower Merion PA'), ('nj','Cherry Hill NJ')):
-        net, p = working_net(st)
-        print(f"  {label:18} fed ${p['fed']:>9,.0f} | payroll ${p['payroll']:>8,.0f} "
-              f"| Philly ${p['philly']:>8,.0f} | state/local ${p['state_local']:>8,.0f} "
-              f"| NET ${net:>9,.0f}")
-    print(f"  working-years difference: ${NJ_NET-PA_NET:>+,.0f}/yr "
-          f"({'NJ cheaper' if NJ_NET>PA_NET else 'PA cheaper'})\n")
-    print(f"  NJ retirement tax on ${ASSUMED_WITHDRAWAL:,} of withdrawals "
-          f"({int(TAX_DEFERRED_SHARE*100)}% tax-deferred): "
-          f"${nj_retirement_tax(ASSUMED_WITHDRAWAL):,.0f}/yr   PA: $0\n")
-    print(f"{'location':40} {'price':>10} {'P&I':>9} {'carry':>9} {'yr1':>10}")
+    print(f"working net: PA ${PA_NET:,.0f}  NJ ${NJ_NET:,.0f}  -> NJ banks ${NJ_NET-PA_NET:,.0f}/yr")
+    print(f"NJ retirement tax (net of Stay NJ + ANCHOR) at sample draws:")
+    for d in (80_000,100_000,140_000,160_000,200_000):
+        print(f"   draw ${d:>7,} -> ${nj_retirement_tax(d):>+8,.0f}")
+    print(f"\n{'location':42}{'price':>11}{'P&I':>10}{'carry':>10}{'yr1':>11}")
     for vid,(name,state,price) in LOCATIONS.items():
-        down=price*DOWN_PCT
-        carry=price*(PROPERTY_TAX[state]+INSURANCE_PCT+MAINTENANCE_PCT)
-        print(f"{name:40} {price:>10,} {pmt(price-down):>9,.0f} {carry:>9,.0f} "
-              f"{pmt(price-down)+carry:>10,.0f}")
+        carry = price*(PROPERTY_TAX[state]+INSURANCE_PCT+MAINTENANCE_PCT)
+        print(f"{name:42}{price:>11,}{pmt(price*(1-DOWN_PCT)):>10,.0f}{carry:>10,.0f}"
+              f"{pmt(price*(1-DOWN_PCT))+carry:>11,.0f}")
+    print(f"\ndescription chars: {len(grid['description'])}")
