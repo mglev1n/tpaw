@@ -55,10 +55,10 @@ SIMONE_ATTENDING_GROSS = 250_000   # ASSUMPTION - to be swept
 # else on this page.
 LIVING_EXPENSES_PER_MONTH = 8_000
 HOUSING_IN_EXPENSES = True
-CURRENT_RENT_PER_MONTH = 2_800     # only used when the above is False
+CURRENT_RENT_PER_MONTH = 3_000     # only used when the above is False
 # Actual outgoings over the trailing twelve months, one-offs included. Used as
 # a sanity check on the figure above, not as a model input.
-OBSERVED_SPEND_LAST_12MO = 100_000
+OBSERVED_SPEND_LAST_12MO = 90_000
 
 # --- Children -------------------------------------------------------------
 # None yet. Birth years are an ASSUMPTION, used only by the schooling
