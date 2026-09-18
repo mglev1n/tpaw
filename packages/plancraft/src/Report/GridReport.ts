@@ -2,6 +2,12 @@ import { block } from '@tpaw/common'
 import _ from 'lodash'
 import { ScenarioRun } from '../Batch/RunMatrix'
 import { GeneratedGrid } from '../Grid/GenerateGrid'
+import {
+  ASSUMPTIONS_STYLE,
+  AssumptionsData,
+  getAssumptionsData,
+  getAssumptionsHtml,
+} from './Assumptions'
 import { STYLE, _esc, _pct, _usd, _usdCompact } from './HtmlReport'
 
 // Grid report for full-factorial decision sweeps, optionally replicated
@@ -48,6 +54,11 @@ export type GridReportData = {
     person1AgeAtAnchor: number
     numYears: number
   }
+  // Every critical input behind the numbers -- legacy target, expected
+  // returns, portfolio, and the money flows each variant adds or replaces --
+  // read straight from the scenarios that were simulated, so a report cannot
+  // quote assumptions that differ from the ones it ran.
+  assumptions: AssumptionsData
   results: GridComboResult[]
   // dimension -> variant -> condition -> mean spending
   mainEffects: {
@@ -174,6 +185,7 @@ export const getGridReportData = (
     }
 
   return {
+    assumptions: getAssumptionsData(generated),
     gridName: generated.grid.name,
     gridDescription: generated.grid.description ?? null,
     dimensions: generated.grid.dimensions.map((d) => ({
@@ -408,7 +420,7 @@ export const getGridHtml = (
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${_esc(data.gridName)}</title>
-<style>${STYLE}
+<style>${STYLE}${ASSUMPTIONS_STYLE}
 h3 { font-size: 14.5px; margin: 18px 0 6px }
 table.num td:first-child { white-space: nowrap }
 </style></head><body><main>
@@ -421,6 +433,8 @@ ${data.gridDescription ? `<p class="sub">${_esc(data.gridDescription)}</p>` : ''
 <p>Median first-year retirement spending spans <strong>${_usd(worst.medianRetirementSpending)}/mo</strong>
 (${_esc(worst.name)}) to <strong>${_usd(best.medianRetirementSpending)}/mo</strong> (${_esc(best.name)}).</p>
 </section>
+
+${getAssumptionsHtml(data.assumptions)}
 
 ${_effectsSection(data)}
 

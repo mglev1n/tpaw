@@ -1,3 +1,4 @@
+import { ASSUMPTIONS_STYLE, getAssumptionsHtml } from './Assumptions'
 import { GridReportData } from './GridReport'
 import { STYLE, _esc } from './HtmlReport'
 
@@ -415,14 +416,16 @@ export const getGridExplorerHtml = (data: GridReportData): string => {
     .join('')
 
   // Embedded as JSON; "<" is escaped so a stray "</script>" in any label
-  // cannot terminate the script element early.
-  const payload = JSON.stringify(data).replace(/</g, '\\u003c')
+  // cannot terminate the script element early. Assumptions are rendered
+  // server-side into the page, so they are dropped from the client payload.
+  const { assumptions: _assumptions, ...clientData } = data
+  const payload = JSON.stringify(clientData).replace(/</g, '\\u003c')
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${_esc(data.gridName)} — explorer</title>
-<style>${STYLE}${EXPLORER_STYLE}</style>
+<style>${STYLE}${EXPLORER_STYLE}${ASSUMPTIONS_STYLE}</style>
 </head><body><main class="wide">
 <h1>${_esc(data.gridName)}</h1>
 <p class="sub">Interactive explorer · ${data.results.length} simulations across ${data.conditions.length} condition(s)</p>
@@ -462,6 +465,8 @@ ${data.gridDescription ? `<p class="sub">${_esc(data.gridDescription)}</p>` : ''
 
 <h2>Detail</h2>
 <section class="card" id="detail"></section>
+
+${getAssumptionsHtml(data.assumptions)}
 
 <script>window.__GRID__ = ${payload};</script>
 <script>${EXPLORER_SCRIPT}</script>
