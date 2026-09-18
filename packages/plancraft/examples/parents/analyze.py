@@ -13,8 +13,8 @@ NAMES = {'none': 'No support needed',
          'us-severe': 'US, home care 2030, nursing 2033',
          'br-light': 'Brazil, home care from 2032',
          'br-heavy': 'Brazil, home care 2030, nursing 2034'}
-HOUSES = {'ch-08003': 'Cherry Hill $655k', 'ml-wynnewood': 'Wynnewood $1.07M',
-          'ml-brynmawr': 'Bryn Mawr $1.18M'}
+HOUSES = {'ch-08003': 'Cherry Hill $655k', 'ch-850k': 'Cherry Hill $850k',
+          'ch-1m': 'Cherry Hill $1.0M', 'ml-brynmawr': 'Bryn Mawr $1.18M'}
 usd = lambda v: '$' + format(round(v), ',')
 
 rows = load(sys.argv[1])

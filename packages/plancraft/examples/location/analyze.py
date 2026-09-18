@@ -95,6 +95,13 @@ for key in ('ch-08003', 'ch-08034'):
     be = nj_cost / carry_rate('pa')
     print(f"{'$' + format(price, ',.0f'):>22}{'$' + format(nj_cost, ',.0f'):>16}"
           f"{'$' + format(be, ',.0f'):>32}")
+print(f"\n{'Lower Merion house':>22}{'PA annual cost':>16}{'break-even Cherry Hill price':>32}")
+for key in ('ml-brynmawr', 'ml-wynnewood'):
+    price = LOCATIONS[key][2]
+    pa_cost = price * carry_rate('pa')
+    be = (pa_cost + NJ_WORKING_EDGE) / carry_rate('nj')
+    print(f"{'$' + format(price, ',.0f'):>22}{'$' + format(pa_cost, ',.0f'):>16}"
+          f"{'$' + format(be, ',.0f'):>32}")
 print('\nAbove the break-even price the Main Line costs more per year than Cherry Hill;')
 print('below it, less. Retirement-phase tax excluded -- it is within a few hundred')
 print('dollars a month either way and, net of Stay NJ and ANCHOR relief, often favors NJ.')

@@ -305,6 +305,188 @@
           ]
         },
         {
+          "id": "ch-850k",
+          "name": "Cherry Hill $850k",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 51577
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-1m",
+          "name": "Cherry Hill $1.0M",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 200000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 60679
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40990
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
           "id": "ch-samespend",
           "name": "Cherry Hill $1.07M (same spend)",
           "events": [

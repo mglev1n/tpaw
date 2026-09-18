@@ -138,10 +138,10 @@ def share_variants():
 
 def house_variants():
     """Reuse the verified location variants: the same 4BR at each price."""
-    keep = {'ch-08003': 'Cherry Hill $655k (NJ)',
-            'ml-wynnewood': 'Wynnewood $1.07M (PA)',
-            'ml-brynmawr': 'Bryn Mawr $1.18M (PA)'}
-    return [v for v in loc.location_variants() if v['id'] in keep]
+    keep = ('ch-08003', 'ch-850k', 'ch-1m', 'ml-brynmawr')
+    order = {k: i for i, k in enumerate(keep)}
+    return sorted((v for v in loc.location_variants() if v['id'] in keep),
+                  key=lambda v: order[v['id']])
 
 
 SS = loc.SS[65]

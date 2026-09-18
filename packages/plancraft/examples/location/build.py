@@ -122,6 +122,12 @@ LOCATIONS = collections.OrderedDict([
     ('ml-wynnewood', ('Wynnewood $1.07M',            'pa', 1_068_301)),
     ('ch-08003',     ('Cherry Hill $655k (= Bryn Mawr house)', 'nj', 654_591)),
     ('ch-08034',     ('Cherry Hill $572k',           'nj',   572_405)),
+    # Trading up within Cherry Hill. At 2.699% the NJ property tax rate is
+    # ~1.9x Lower Merion's, so price buys less house-year here than on the
+    # Main Line: the ladder converges on Bryn Mawr's carrying cost well below
+    # Bryn Mawr's price.
+    ('ch-850k',      ('Cherry Hill $850k',           'nj',   850_000)),
+    ('ch-1m',        ('Cherry Hill $1.0M',           'nj', 1_000_000)),
     ('ch-samespend', ('Cherry Hill $1.07M (same spend)',      'nj', 1_068_301)),
 ])
 SAVINGS_RATES = collections.OrderedDict([('hi',0.40),('mid',0.31),('lo',0.23)])
