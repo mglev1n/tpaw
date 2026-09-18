@@ -1,6 +1,11 @@
 import { GeneratedGrid } from '../Grid/GenerateGrid'
 import { ScenarioFile, scenarioFileSchema } from '../Schema/ScenarioSchema'
-import { getAssumptionsData, getAssumptionsHtml } from './Assumptions'
+import {
+  describeScenario,
+  getAssumptionsData,
+  getAssumptionsHtml,
+  getScenarioAssumptionsHtml,
+} from './Assumptions'
 
 const base = (): ScenarioFile =>
   scenarioFileSchema.parse({
@@ -175,5 +180,64 @@ describe('assumptions', () => {
     expect(html).toContain('amortized to zero')
     expect(html).toContain('nominal')
     expect(html).not.toContain('<script')
+  })
+})
+
+describe('comparison assumptions', () => {
+  const a = describeScenario(base())
+  const b = describeScenario({
+    ...base(),
+    meta: { ...base().meta, name: 'Bigger house' },
+    events: [
+      ...base().events,
+      {
+        id: 'house-pi',
+        label: 'Mortgage principal and interest',
+        kind: 'expenseEssential',
+        nominal: true,
+        amount: { perYear: 71597 },
+        timing: {
+          from: { calendarYear: 2027, month: 1 },
+          to: { calendarYear: 2056, month: 12 },
+        },
+      },
+    ],
+  })
+
+  it('describes a standalone scenario', () => {
+    expect(a.name).toBe('Base')
+    expect(a.portfolio).toBe(400000)
+    expect(a.events.map((e) => e.id)).toEqual(['save', 'tuition'])
+  })
+
+  it('hoists settings shared by every scenario and keeps the rest per scenario', () => {
+    const html = getScenarioAssumptionsHtml([a, b])
+    // Household, portfolio and simulation are identical, so they appear once.
+    expect(html).toContain('identical across every scenario')
+    expect(html.match(/Starting portfolio/g)).toHaveLength(1)
+    expect(html.match(/Legacy target \(real\)/g)).toHaveLength(1)
+    // The differing flow shows under its own scenario.
+    expect(html).toContain('Bigger house')
+    expect(html).toContain('$71,597/yr')
+    expect(html).toContain('nominal')
+  })
+
+  it('drops a differing setting back into each scenario instead of hoisting it', () => {
+    const c = describeScenario({
+      ...base(),
+      meta: { ...base().meta, name: 'With legacy' },
+      simulation: { ...base().simulation, legacy: 5000000 },
+    })
+    const html = getScenarioAssumptionsHtml([a, c])
+    // Household and portfolio still match, so they are still hoisted once...
+    expect(html.match(/Starting portfolio/g)).toHaveLength(1)
+    // ...but the simulation block now repeats per scenario, showing both targets.
+    expect(html.match(/Legacy target \(real\)/g)).toHaveLength(2)
+    expect(html).toContain('$5,000,000')
+    expect(html).toContain('amortized to zero')
+  })
+
+  it('returns nothing for an empty list', () => {
+    expect(getScenarioAssumptionsHtml([])).toBe('')
   })
 })

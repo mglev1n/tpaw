@@ -27,6 +27,19 @@ export type AssumptionEvent = {
   notes: string
 }
 
+// One standalone scenario's inputs. The grid form below is this plus the
+// per-variant overlays; the comparison report comes as N independent
+// scenarios instead, so it renders a list of these.
+export type ScenarioAssumptions = {
+  name: string
+  anchorYear: number | null
+  people: { id: string; currentAge: string; retirementAge: string; maxAge: string }[]
+  withdrawalStart: string
+  portfolio: number
+  simulation: { label: string; value: string }[]
+  events: AssumptionEvent[]
+}
+
 export type AssumptionsData = {
   anchorYear: number | null
   people: { id: string; currentAge: string; retirementAge: string; maxAge: string }[]
@@ -159,6 +172,19 @@ export const describeSimulation = (
 }
 
 const _pctOf = (x: number) => `${Math.round(x * 100)}%`
+
+export const describeScenario = (s: ScenarioFile): ScenarioAssumptions => ({
+  name: s.meta.name,
+  anchorYear: s.meta.anchorYear ?? null,
+  people: [
+    _person('Person 1', s.household.person1),
+    ...(s.household.person2 ? [_person('Person 2', s.household.person2)] : []),
+  ],
+  withdrawalStart: PERSON(s.household.withdrawalStart),
+  portfolio: s.portfolio.balance,
+  simulation: describeSimulation(s.simulation, { includeDefaults: true }),
+  events: s.events.map(describeEvent),
+})
 
 export const getAssumptionsData = (generated: GeneratedGrid): AssumptionsData => {
   const base = generated.base
@@ -341,6 +367,77 @@ export const getAssumptionsHtml = (d: AssumptionsData): string => {
     `<h3>What each decision changes</h3>` +
     `<p class="muted">Each variant below overlays these on the base above. A flow ` +
     `whose id matches a base flow replaces it.</p>${dims}${conditions}` +
+    `</div></details>`
+  )
+}
+
+// --- Comparison report ------------------------------------------------------
+
+// Scenarios in a comparison are independent files rather than overlays on a
+// shared base, so there is no "what changed" to render. Instead each is shown
+// in full, and any setting that is identical across all of them is pulled out
+// into a shared block so the differences are what remain per scenario.
+export const getScenarioAssumptionsHtml = (
+  list: ScenarioAssumptions[],
+): string => {
+  if (list.length === 0) return ''
+  const first = list[0]!
+  const same = (pick: (s: ScenarioAssumptions) => string) =>
+    list.every((s) => pick(s) === pick(first))
+  const kvKey = (s: ScenarioAssumptions) => JSON.stringify(s.simulation)
+  const peopleKey = (s: ScenarioAssumptions) => JSON.stringify(s.people)
+  const sharedSim = same(kvKey)
+  const sharedPeople = same(peopleKey)
+  const sharedPortfolio = list.every((s) => s.portfolio === first.portfolio)
+
+  const peopleTable = (s: ScenarioAssumptions) =>
+    `<table class="assumptions"><thead><tr><th>Person</th>` +
+    `<th class="num">Age now</th><th class="num">Retires at</th>` +
+    `<th class="num">Plan until</th></tr></thead><tbody>` +
+    s.people
+      .map(
+        (p) =>
+          `<tr><td>${_esc(p.id)}</td><td class="num">${_esc(p.currentAge)}</td>` +
+          `<td class="num">${_esc(p.retirementAge)}</td>` +
+          `<td class="num">${_esc(p.maxAge)}</td></tr>`,
+      )
+      .join('') +
+    '</tbody></table>'
+
+  const shared =
+    (sharedPeople ? `<h3>Household</h3>${peopleTable(first)}` : '') +
+    (sharedPortfolio
+      ? _kv([{ label: 'Starting portfolio', value: _usd(first.portfolio) }])
+      : '') +
+    (sharedSim ? `<h3>Simulation</h3>${_kv(first.simulation)}` : '')
+
+  const per = list
+    .map(
+      (s) =>
+        `<div class="variant-block"><h4>${_esc(s.name)}</h4>` +
+        (sharedPeople ? '' : `${peopleTable(s)}`) +
+        (sharedPortfolio
+          ? ''
+          : _kv([{ label: 'Starting portfolio', value: _usd(s.portfolio) }])) +
+        (sharedSim ? '' : _kv(s.simulation)) +
+        _eventTable(s.events) +
+        '</div>',
+    )
+    .join('')
+
+  return (
+    `<details class="assumptions-block"><summary>Model inputs \u2014 every ` +
+    `assumption behind these numbers</summary><div>` +
+    `<p class="muted">Rendered from the scenario files the simulator ran, not ` +
+    `written by hand. All amounts are real ` +
+    `${first.anchorYear ? first.anchorYear : 'present-day'} dollars, after tax, ` +
+    `unless a flow is marked nominal.</p>` +
+    (shared
+      ? shared +
+        `<p class="muted">The above is identical across every scenario ` +
+        `compared. What differs is below.</p>`
+      : '') +
+    `<h3>Money flows by scenario</h3>${per}` +
     `</div></details>`
   )
 }

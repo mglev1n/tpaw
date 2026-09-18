@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { CompareData, ScenarioCompare, YearlySeries } from './CompareData'
 import { ScenarioError } from '../Compile/ResolveScenario'
+import { ASSUMPTIONS_STYLE, getScenarioAssumptionsHtml } from './Assumptions'
+import { CompareData, ScenarioCompare, YearlySeries } from './CompareData'
 
 // Self-contained comparison report: inline SVG + a small tooltip script, no
 // external dependencies. Colors follow the dataviz reference palette
@@ -507,9 +508,11 @@ export const getComparisonHtml = (data: CompareData, meta: { generatedNote: stri
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scenario comparison</title>
-<style>${STYLE}</style></head><body><main>
+<style>${STYLE}${ASSUMPTIONS_STYLE}</style></head><body><main>
 <h1>Scenario comparison</h1>
 <p class="sub">${_esc(meta.generatedNote)}</p>
+
+${getScenarioAssumptionsHtml(data.assumptions)}
 
 <section class="card">
 <h2 style="margin-top:0">Outcomes</h2>

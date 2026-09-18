@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { ScenarioRun } from '../Batch/RunMatrix'
 import { getYearRows, YearRow } from '../Compile/CompilationReport'
 import { EventSchedule } from '../Compile/CompileToPlanParams'
+import { describeScenario, ScenarioAssumptions } from './Assumptions'
 
 // Everything the comparison report renders, downsampled to yearly points so
 // the HTML stays small (monthly arrays run to ~1,200 points per series).
@@ -36,6 +37,9 @@ export type ScenarioCompare = {
 
 export type CompareData = {
   scenarios: ScenarioCompare[]
+  // The inputs behind each scenario, read from the file that was compiled and
+  // run, so the report cannot quote assumptions it did not simulate.
+  assumptions: ScenarioAssumptions[]
   percentiles: number[]
   baseSlug: string | null
   maxYears: number
@@ -94,6 +98,7 @@ export const getCompareData = (
   })
   return {
     scenarios,
+    assumptions: runs.map((r) => describeScenario(r.compiled.scenario)),
     percentiles,
     baseSlug: opts.baseSlug ?? null,
     maxYears: Math.max(0, ...scenarios.map((x) => x.numYears)),
