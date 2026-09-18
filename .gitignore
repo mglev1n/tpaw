@@ -1,3 +1,6 @@
 node_modules
 .DS_Store
 __pycache__/
+
+# Real household figures (account balances, salaries) stay out of the tree.
+*.local.json
