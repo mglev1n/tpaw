@@ -68,46 +68,6 @@
           "person": "person1"
         }
       }
-    },
-    {
-      "id": "ss-1",
-      "label": "Social Security (Michael, at 70)",
-      "kind": "retirementIncome",
-      "amount": {
-        "perMonth": 4200
-      },
-      "timing": {
-        "from": {
-          "age": {
-            "person": "person1",
-            "years": 70
-          }
-        },
-        "to": {
-          "named": "maxAge",
-          "person": "person1"
-        }
-      }
-    },
-    {
-      "id": "ss-2",
-      "label": "Social Security (Simone, at 70)",
-      "kind": "retirementIncome",
-      "amount": {
-        "perMonth": 3400
-      },
-      "timing": {
-        "from": {
-          "age": {
-            "person": "person2",
-            "years": 70
-          }
-        },
-        "to": {
-          "named": "maxAge",
-          "person": "person2"
-        }
-      }
     }
   ],
   "simulation": {

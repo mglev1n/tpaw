@@ -1,7 +1,7 @@
 {
   "plancraftGrid": 1,
   "name": "House price, schooling and parental support",
-  "description": "Two physicians in Philadelphia, buying in Cherry Hill in 2027 and retiring at 60. Savings is DERIVED here rather than set: the only contribution is net income less living costs, and daycare, tuition, the mortgage and parental support are essential expenses drawn from the portfolio, so the savings rate falls on its own as each one arrives. Children are assumed born in the two years shown, the first during the fellowship. Private school is priced at area independent schools; both schooling branches carry four years of college. Parental support is this household's half of the cost net of the parents' own pension, on the trajectories from the parents example. All amounts are real 2026 dollars after tax; only mortgage principal and interest is nominal.",
+  "description": "Two physicians in Philadelphia, buying in Cherry Hill in 2027. Savings is DERIVED here rather than set: the only contribution is net income less living costs, and daycare, tuition, the mortgage and parental support are essential expenses drawn from the portfolio, so the savings rate falls on its own as each one arrives. Children are assumed born in the two years shown, the first during the fellowship. Private school is priced at area independent schools; both schooling branches carry four years of college. Parental support is this household's half of the cost net of the parents' own pension, on the trajectories from the parents example. The FERS annuity is included throughout, prorated for the 7/8 tour. All amounts are real 2026 dollars after tax, the legacy target included; only mortgage principal and interest is nominal. Alongside the median, the report carries the 5th-percentile spending path, which is the downside that matters here: TPAW re-amortizes every month, so a bad return sequence shows up as spending that declines rather than as a plan that fails, and success probability saturates at 100%.",
   "base": "base.scenario.json",
   "dimensions": [
     {
@@ -614,6 +614,266 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "retire",
+      "name": "Retirement age",
+      "variants": [
+        {
+          "id": "r55",
+          "name": "Retire at 55",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 43385
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r60",
+          "name": "Retire at 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 54323
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r65",
+          "name": "Retire at 65",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 71786
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 65
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legacy",
+      "name": "Real legacy target",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No legacy",
+          "simulation": {
+            "legacy": 0
+          }
+        },
+        {
+          "id": "m5",
+          "name": "Leave $5M real",
+          "simulation": {
+            "legacy": 5000000
+          }
         }
       ]
     }

@@ -239,7 +239,9 @@ def base_scenario(retire_age=RETIRE_BASE):
                         'maxAge': {'years': MAX_AGE}},
             'withdrawalStart': 'person1'}),
         ('portfolio', {'balance': round(I.simulated_portfolio())}),
-        ('events', savings_events() + retirement_income_events(retire_age, False)),
+        # Social Security and the annuity live on the retire dimension, since
+        # both depend on the retirement age.
+        ('events', savings_events()),
         ('simulation', {'expectedReturns': {'fixed': {'stocks': 0.05, 'bonds': 0.02}},
                         'inflation': {'manual': 0.024},
                         'sampling': {'type': 'monteCarlo', 'numRuns': 2000,
@@ -257,6 +259,8 @@ CONDITIONS = [
      'simulation': {'expectedReturns': {'fixed': {'stocks': 0.065, 'bonds': 0.03}}}},
 ]
 
+RETIRE_AGES = [55, 60, 65]
+
 SCHOOLING = collections.OrderedDict([
     ('none', ('No children', None)),
     ('public', ('Two children, public school', False)),
@@ -267,8 +271,8 @@ main_grid = collections.OrderedDict([
     ('plancraftGrid', 1),
     ('name', 'House price, schooling and parental support'),
     ('description', (
-        'Two physicians in Philadelphia, buying in Cherry Hill in 2027 and retiring '
-        'at 60. Savings is DERIVED here rather than set: the only contribution is '
+        'Two physicians in Philadelphia, buying in Cherry Hill in 2027. '
+        'Savings is DERIVED here rather than set: the only contribution is '
         'net income less living costs, and daycare, tuition, the mortgage and '
         'parental support are essential expenses drawn from the portfolio, so the '
         'savings rate falls on its own as each one arrives. Children are assumed '
@@ -276,8 +280,13 @@ main_grid = collections.OrderedDict([
         'school is priced at area independent schools; both schooling branches '
         'carry four years of college. Parental support is this household\'s half '
         'of the cost net of the parents\' own pension, on the trajectories from the '
-        'parents example. All amounts are real 2026 dollars after tax; only '
-        'mortgage principal and interest is nominal.'
+        'parents example. The FERS annuity is included throughout, prorated for the '
+        '7/8 tour. All amounts are real 2026 dollars after tax, the legacy target '
+        'included; only mortgage principal and interest is nominal. Alongside the '
+        'median, the report carries the 5th-percentile spending path, which is the '
+        'downside that matters here: TPAW re-amortizes every month, so a bad return '
+        'sequence shows up as spending that declines rather than as a plan that '
+        'fails, and success probability saturates at 100%.'
     )),
     ('base', 'base.scenario.json'),
     ('dimensions', [
@@ -294,6 +303,21 @@ main_grid = collections.OrderedDict([
             collections.OrderedDict([('id', pid), ('name', name),
                                      ('events', parent_events(path, sched, med))])
             for pid, (path, name, sched, med) in TRAJECTORIES.items()]},
+        {'id': 'retire', 'name': 'Retirement age', 'variants': [
+            collections.OrderedDict([
+                ('id', f'r{a}'), ('name', f'Retire at {a}'),
+                ('household', {'person1': {'retirementAge': {'years': a}},
+                               'person2': {'retirementAge': {'years': a}}}),
+                ('events', retirement_income_events(a, True)),
+            ]) for a in RETIRE_AGES]},
+        {'id': 'legacy', 'name': 'Real legacy target', 'variants': [
+            collections.OrderedDict([
+                ('id', 'none'), ('name', 'No legacy'),
+                ('simulation', {'legacy': 0})]),
+            collections.OrderedDict([
+                ('id', 'm5'), ('name', 'Leave $5M real'),
+                ('simulation', {'legacy': 5_000_000})]),
+        ]},
     ]),
     ('conditions', CONDITIONS),
 ])
@@ -303,7 +327,6 @@ LIFESTYLE = collections.OrderedDict([
     ('mid', ('Live on $10,000/mo', 10 / 8)),
     ('rich', ('Live on $12,000/mo', 12 / 8)),
 ])
-RETIRE_AGES = [55, 60, 65]
 
 fers_grid = collections.OrderedDict([
     ('plancraftGrid', 1),

@@ -30,6 +30,20 @@ export type GridComboResult = {
   medianRetirementSpending: number
   medianBalanceAtRetirement: number
   endingBalanceP50: number
+  // TPAW re-amortizes every month, so a bad return sequence shows up as
+  // spending that declines rather than as a plan that fails -- which is why
+  // success probability saturates at 100% in well-funded plans and says
+  // almost nothing. The downside that matters is the 5th-percentile spending
+  // path: the lifestyle a bad sequence actually leaves you with.
+  //
+  // This is a DIFFERENT uncertainty from the grid's conditions. A condition
+  // is a different world (we do not know the true expected return); a
+  // percentile is a bad draw within one world. They compound, so the honest
+  // worst case is p5 under the pessimistic condition, not either alone.
+  p5RetirementSpending: number
+  // Lowest 5th-percentile monthly spending at any point after retirement --
+  // the floor a bad sequence grinds down to, which for TPAW arrives late.
+  p5SpendingFloor: number
   // Annual-resolution median trajectories for the interactive explorer,
   // quantized to keep the embedded payload small: balance in $1,000s,
   // lifestyle spending in $/month. Index 0 is the anchor year.
@@ -111,6 +125,13 @@ export const getGridReportData = (
     // retirement) as spending and invert cost comparisons.
     const spending = _medianSeries(outcome.withdrawalsRegular)
     const balance = _medianSeries(outcome.balanceStart)
+    const p5 =
+      outcome.withdrawalsRegular.find((x) => x.percentile === 5)?.data ??
+      outcome.withdrawalsRegular[0]?.data ??
+      []
+    // The final months of the plan taper to zero by construction, so the
+    // floor is taken over retirement excluding the last year.
+    const p5Retirement = p5.slice(wsMFN, Math.max(wsMFN + 1, p5.length - 12))
     // Sample one point per 12 months (January of each anchor-relative year).
     const byYear = (series: number[], scale: number) =>
       _.range(0, Math.ceil(series.length / 12)).map((y) =>
@@ -124,6 +145,8 @@ export const getGridReportData = (
       successProbability: outcome.successProbability,
       medianRetirementSpending: _.mean(spending.slice(wsMFN, wsMFN + 12)) || 0,
       medianBalanceAtRetirement: balance[Math.min(wsMFN, balance.length - 1)] ?? 0,
+      p5RetirementSpending: _.mean(p5.slice(wsMFN, wsMFN + 12)) || 0,
+      p5SpendingFloor: p5Retirement.length ? Math.min(...p5Retirement) : 0,
       endingBalanceP50:
         outcome.endingBalanceByPercentile.find((x) => x.percentile === 50)
           ?.balance ?? 0,
@@ -217,6 +240,8 @@ export const getGridCsv = (data: GridReportData): string => {
     'condition',
     ...dims.map((d) => d.id),
     'medianRetirementSpendingPerMonth',
+    'p5RetirementSpendingPerMonth',
+    'p5SpendingFloorPerMonth',
     'successProbability',
     'medianBalanceAtRetirement',
     'endingBalanceP50',
@@ -226,6 +251,8 @@ export const getGridCsv = (data: GridReportData): string => {
       r.conditionId,
       ...dims.map((d) => r.cells[d.id]),
       Math.round(r.medianRetirementSpending),
+      Math.round(r.p5RetirementSpending),
+      Math.round(r.p5SpendingFloor),
       r.successProbability.toFixed(4),
       Math.round(r.medianBalanceAtRetirement),
       Math.round(r.endingBalanceP50),
@@ -366,7 +393,10 @@ const _rankedTable = (
   const header =
     '<tr><th>#</th>' +
     dims.map((d) => `<th>${_esc(d.name)}</th>`).join('') +
-    '<th>Spending /mo</th><th>Success</th><th>Balance at retirement</th><th>Ending p50</th></tr>'
+    '<th>Spending /mo</th><th title="5th percentile, first year of retirement">' +
+    'p5 /mo</th><th title="Lowest 5th-percentile monthly spending after ' +
+    'retirement">p5 floor</th><th>Success</th>' +
+    '<th>Balance at retirement</th><th>Ending p50</th></tr>'
   const rows = shown
     .map((r) => {
       const rank = sorted.indexOf(r) + 1
@@ -374,6 +404,8 @@ const _rankedTable = (
         `<tr><td class="muted">${rank}</td>` +
         dims.map((d) => `<td>${_esc(r.cellNames[d.id] ?? '')}</td>`).join('') +
         `<td>${_usd(r.medianRetirementSpending)}</td>` +
+        `<td class="muted">${_usd(r.p5RetirementSpending)}</td>` +
+        `<td class="muted">${_usd(r.p5SpendingFloor)}</td>` +
         `<td>${_pct(r.successProbability)}</td>` +
         `<td>${_usdCompact(r.medianBalanceAtRetirement)}</td>` +
         `<td>${_usdCompact(r.endingBalanceP50)}</td></tr>`
