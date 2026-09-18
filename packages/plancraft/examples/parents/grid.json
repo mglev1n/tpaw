@@ -1,0 +1,496 @@
+{
+  "plancraftGrid": 1,
+  "name": "Parental support: US vs Brazil, and who pays",
+  "description": "Two 37-year-olds, $500,000 gross, both working in Philadelphia, saving 31% of net, retiring at 65. Simone's parents are 82 and 80 in Brazil. Her sister naturalizes in 2026 and can petition for them as immediate relatives, so lawful permanent residence lands around 2028 and the Medicare buy-in opens around 2033 after the five-year residency bar. Before that they rely on the ACA marketplace, where a reportable pension of $30,000 puts them at 142% of the federal poverty level for a couple and premium tax credits cut the cost of benchmark silver coverage from about $28,000 a year to about $1,100. Below 100% FPL there is no credit at all as of plan year 2026 and above 400% the cliff has returned. Medicare never covers custodial long-term care, and Medicaid is blocked first by the five-year bar and then by sponsor deeming under the I-864 affidavit, so care is paid out of pocket either way -- at roughly four to five times the Brazilian price. Each variant is this household's share of the cost net of the parents' own pension, split with Simone's sister and brother-in-law.",
+  "base": "base.scenario.json",
+  "dimensions": [
+    {
+      "id": "support",
+      "name": "Parents: where they age",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No support needed",
+          "events": []
+        },
+        {
+          "id": "us-healthy",
+          "name": "US, stay independent - we pay 50%",
+          "events": [
+            {
+              "id": "parents-us-healthy-0",
+              "label": "Parental support 2033-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 7744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2033,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "us-typical",
+          "name": "US, one in assisted 2032, both nursing 2036 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-us-typical-0",
+              "label": "Parental support 2032-2032",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 37753
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-us-typical-1",
+              "label": "Parental support 2033-2035",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 49744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2033,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-us-typical-2",
+              "label": "Parental support 2036-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 157744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2036,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "us-severe",
+          "name": "US, home care 2030 then nursing 2033 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-us-severe-0",
+              "label": "Parental support 2030-2032",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 79753
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-us-severe-1",
+              "label": "Parental support 2033-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 157744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2033,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "br-light",
+          "name": "Brazil, home care from 2032 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-br-light-0",
+              "label": "Parental support 2026-2031",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 3045
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2031,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-br-light-1",
+              "label": "Parental support 2032-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 10682
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "br-heavy",
+          "name": "Brazil, home care 2030 then nursing 2034 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-br-heavy-0",
+              "label": "Parental support 2026-2029",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 3045
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-br-heavy-1",
+              "label": "Parental support 2030-2033",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 10682
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2033,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-br-heavy-2",
+              "label": "Parental support 2034-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 20500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "house",
+      "name": "House",
+      "variants": [
+        {
+          "id": "ml-brynmawr",
+          "name": "Bryn Mawr $1.18M",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 235989
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 71597
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 33121
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ml-wynnewood",
+          "name": "Wynnewood $1.07M",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 213660
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 64823
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 29987
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-08003",
+          "name": "Cherry Hill $655k (= Bryn Mawr house)",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 130918
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 39720
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 26832
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "optimistic",
+      "name": "Optimistic (6.5%/3%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.065,
+            "bonds": 0.03
+          }
+        }
+      }
+    }
+  ]
+}
