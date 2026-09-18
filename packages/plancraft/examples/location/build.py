@@ -266,7 +266,64 @@ grid = collections.OrderedDict([
     ]),
 ])
 
-for _n,_o in [('base.scenario.json',base),('grid.json',grid)]:
+# --- The same location decision, but funding a real bequest ----------------
+# grid.json amortizes the portfolio to zero at 95. That is not the plan if a
+# legacy is wanted, and it also flatters the expensive house: the target
+# applies to the PORTFOLIO, and the house sits outside it, so a $1.18M house
+# is already a $1.18M bequest that never has to be funded out of savings.
+# Held at a 31% savings rate and retirement at 65 so location and legacy are
+# the only things moving.
+LEGACY_LEVELS = collections.OrderedDict([
+    ('none', 0), ('m1', 1_000_000), ('m5', 5_000_000)])
+
+legacy_grid = collections.OrderedDict([
+    ('plancraftGrid', 1),
+    ('name', 'Main Line vs Cherry Hill, funding a real legacy'),
+    ('description', (
+        'The same households as grid.json -- two 37-year-olds, $500,000 gross, both '
+        'working in Philadelphia, house bought 2027 with 20% down at 6.5% -- held at '
+        'a 31% savings rate and retirement at 65, so location and the legacy target '
+        'are the only things moving. Every figure is in real 2026 dollars: expected '
+        'returns are real, the legacy target is real, and the only nominal amount in '
+        'the model is mortgage principal and interest, which is fixed in then-current '
+        'dollars and therefore erodes across the 30-year term. The target applies to '
+        'the portfolio alone. House equity is a bequest on top of it, and the houses '
+        'differ by more than $500,000, so at a common target the cheaper house is '
+        'leaving materially less in total -- see analyze.py for the like-for-like '
+        'comparison that funds the house-price gap as portfolio legacy.'
+    )),
+    ('base', 'base.scenario.json'),
+    ('dimensions', [
+        {'id':'location','name':'Location and house','variants':location_variants()},
+        {'id':'legacy','name':'Real legacy target','variants':[
+            collections.OrderedDict([
+                ('id', lid),
+                ('name', 'No legacy' if amt == 0 else f'Leave ${amt/1e6:.0f}M real'),
+                ('simulation', {'legacy': amt}),
+            ]) for lid, amt in LEGACY_LEVELS.items()]},
+        {'id':'savings','name':'Savings rate','variants':savings_dimension()[1:2]},
+        {'id':'retire','name':'Retirement age','variants':[
+            collections.OrderedDict([
+                ('id','r65'), ('name','Retire at 65'),
+                ('household',{'person1':{'retirementAge':{'years':65}},
+                              'person2':{'retirementAge':{'years':65}}}),
+                ('events',[
+                    event('ss-1','Social Security (person 1, at 70)','retirementIncome',
+                          {'perMonth':SS[65][0]},
+                          {'from':{'age':{'person':'person1','years':70}},
+                           'to':{'named':'maxAge','person':'person1'}}),
+                    event('ss-2','Social Security (person 2, at 70)','retirementIncome',
+                          {'perMonth':SS[65][1]},
+                          {'from':{'age':{'person':'person2','years':70}},
+                           'to':{'named':'maxAge','person':'person2'}}),
+                ]),
+            ])]},
+    ]),
+    ('conditions', grid['conditions']),
+])
+
+for _n,_o in [('base.scenario.json',base),('grid.json',grid),
+              ('grid-legacy.json',legacy_grid)]:
     with open(os.path.join(HERE,_n),'w') as f:
         json.dump(_o,f,indent=2); f.write('\n')
 
