@@ -63,7 +63,19 @@ OBSERVED_SPEND_LAST_12MO = 90_000
 # --- Children -------------------------------------------------------------
 # None yet. Birth years are an ASSUMPTION, used only by the schooling
 # dimension; set to [] to drop children from the model entirely.
-KIDS = {'birth_years': [2028, 2030]}
+KIDS = {'birth_years': [2029, 2031]}
+
+# --- Federal service ------------------------------------------------------
+# A part-time tour is prorated in the FERS formula: the annuity is computed on
+# the FULL-TIME high-3 and then multiplied by the ratio of hours actually
+# worked to full-time hours across the career.
+FERS = {'service_start': (2024, 8), 'proration': 1.0,
+        'full_time_high3': 200_000, 'mra': 57}
+
+# --- Social Security ------------------------------------------------------
+# ESTIMATES. Real figures come from each earnings record at ssa.gov; a career
+# that starts with training years lands well below the maximum.
+SOCIAL_SECURITY = {'michael_at_70': 4_000, 'simone_at_70': 3_200}
 
 # --- History --------------------------------------------------------------
 # Total assets (excluding card balances) at two dates, so the savings rate can
