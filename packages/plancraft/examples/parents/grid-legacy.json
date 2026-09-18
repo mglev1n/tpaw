@@ -1,0 +1,547 @@
+{
+  "plancraftGrid": 1,
+  "name": "What a legacy target costs, against house and parents",
+  "description": "Every other grid in this example amortizes the portfolio to exactly zero at age 95, so nothing is left for children and the spending figures are the maximum the portfolio can support. This one sweeps a portfolio legacy target against the house ladder and the parental trajectory. Read it alongside the house equity, which the legacy target does NOT cover: the house is outside the portfolio, so a $1.18M house is already a $1.18M bequest and a $655k house is a $655k one. A household in the cheaper house has to fund roughly $525,000 of portfolio legacy before the two are leaving the same amount, which is the like-for-like comparison.",
+  "base": "base.scenario.json",
+  "dimensions": [
+    {
+      "id": "legacy",
+      "name": "Portfolio legacy target",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No legacy",
+          "simulation": {
+            "legacy": 0
+          }
+        },
+        {
+          "id": "m1",
+          "name": "Leave $1.0M",
+          "simulation": {
+            "legacy": 1000000
+          }
+        },
+        {
+          "id": "m2_5",
+          "name": "Leave $2.5M",
+          "simulation": {
+            "legacy": 2500000
+          }
+        },
+        {
+          "id": "m5",
+          "name": "Leave $5.0M",
+          "simulation": {
+            "legacy": 5000000
+          }
+        }
+      ]
+    },
+    {
+      "id": "house",
+      "name": "House",
+      "variants": [
+        {
+          "id": "ch-08003",
+          "name": "Cherry Hill $655k (= Bryn Mawr house)",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 130918
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 39720
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 26832
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-850k",
+          "name": "Cherry Hill $850k",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 51577
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ch-1m",
+          "name": "Cherry Hill $1.0M",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 200000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 60679
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40990
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "save-nj-tax-edge",
+              "label": "Banked NJ income tax advantage",
+              "kind": "savings",
+              "amount": {
+                "perYear": 5750
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "ml-brynmawr",
+          "name": "Bryn Mawr $1.18M",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 235989
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 71597
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 33121
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "name": "Parents",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No support needed",
+          "events": []
+        },
+        {
+          "id": "us-typical",
+          "name": "US, one in assisted 2032, both nursing 2036 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-us-typical-0",
+              "label": "Parental support 2032-2032",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 37753
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-us-typical-1",
+              "label": "Parental support 2033-2035",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 49744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2033,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-us-typical-2",
+              "label": "Parental support 2036-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 157744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2036,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "br-heavy",
+          "name": "Brazil, home care 2030 then nursing 2034 - we pay 50%",
+          "events": [
+            {
+              "id": "parents-br-heavy-0",
+              "label": "Parental support 2026-2029",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 3045
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-br-heavy-1",
+              "label": "Parental support 2030-2033",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 10682
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2033,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-br-heavy-2",
+              "label": "Parental support 2034-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 20500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "optimistic",
+      "name": "Optimistic (6.5%/3%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.065,
+            "bonds": 0.03
+          }
+        }
+      }
+    }
+  ]
+}

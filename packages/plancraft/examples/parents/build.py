@@ -245,15 +245,63 @@ share_grid = collections.OrderedDict([
     ('conditions', grid['conditions']),
 ])
 
+# --- Legacy ----------------------------------------------------------------
+# Every other grid here runs legacy=0: TPAW amortizes the portfolio to exactly
+# zero at age 95, so the spending figures are the maximum the portfolio can
+# support and nothing is earmarked for children.
+#
+# That understates the expensive house. The legacy target applies to the
+# PORTFOLIO only -- the house is not in it, so a household in a $1.18M house
+# already bequeaths $1.18M outside the model while a household in a $655k
+# house bequeaths $655k. Comparing them at a common portfolio legacy of zero
+# silently credits the expensive house with a $525k bequest it never has to
+# fund. analyze_legacy.py adds house equity back to make the comparison
+# like-for-like.
+LEGACY_LEVELS = collections.OrderedDict([
+    ('none', 0), ('m1', 1_000_000), ('m2_5', 2_500_000), ('m5', 5_000_000)])
+
+legacy_grid = collections.OrderedDict([
+    ('plancraftGrid', 1),
+    ('name', 'What a legacy target costs, against house and parents'),
+    ('description', (
+        'Every other grid in this example amortizes the portfolio to exactly zero '
+        'at age 95, so nothing is left for children and the spending figures are '
+        'the maximum the portfolio can support. This one sweeps a portfolio legacy '
+        'target against the house ladder and the parental trajectory. Read it '
+        'alongside the house equity, which the legacy target does NOT cover: the '
+        'house is outside the portfolio, so a $1.18M house is already a $1.18M '
+        'bequest and a $655k house is a $655k one. A household in the cheaper house '
+        'has to fund roughly $525,000 of portfolio legacy before the two are '
+        'leaving the same amount, which is the like-for-like comparison.'
+    )),
+    ('base', 'base.scenario.json'),
+    ('dimensions', [
+        {'id': 'legacy', 'name': 'Portfolio legacy target', 'variants': [
+            collections.OrderedDict([
+                ('id', lid),
+                ('name', 'No legacy' if amt == 0 else f'Leave ${amt / 1e6:.1f}M'),
+                ('simulation', {'legacy': amt}),
+            ]) for lid, amt in LEGACY_LEVELS.items()]},
+        {'id': 'house', 'name': 'House', 'variants': house_variants()},
+        {'id': 'support', 'name': 'Parents', 'variants': [
+            v for v in support_variants()
+            if v['id'] in ('none', 'us-typical', 'br-heavy')]},
+    ]),
+    ('conditions', grid['conditions']),
+])
+
 for _n, _o in [('base.scenario.json', base), ('grid.json', grid),
-               ('grid-share.json', share_grid)]:
+               ('grid-share.json', share_grid),
+               ('grid-legacy.json', legacy_grid)]:
     with open(os.path.join(HERE, _n), 'w') as f:
         json.dump(_o, f, indent=2)
         f.write('\n')
 
 if __name__ == '__main__':
-    for g in (grid, share_grid):
-        n = len(g['dimensions'][0]['variants']) * len(g['dimensions'][1]['variants'])
+    for g in (grid, share_grid, legacy_grid):
+        n = 1
+        for d in g['dimensions']:
+            n *= len(d['variants'])
         print(f'{g["name"]}: {n} combinations x {len(g["conditions"])} = '
               f'{n * len(g["conditions"])} simulations '
               f'({len(g["description"])} description chars)')
