@@ -53,9 +53,24 @@ SIMONE_ATTENDING_GROSS = 250_000   # ASSUMPTION - to be swept
 # question; HOUSING_IN_EXPENSES toggles the reading and cashflow.py reports
 # both, because the savings rate is more sensitive to this than to anything
 # else on this page.
-LIVING_EXPENSES_PER_MONTH = 6_000
-HOUSING_IN_EXPENSES = False
-CURRENT_RENT_PER_MONTH = 3_000     # ASSUMPTION, only used when the above is False
+LIVING_EXPENSES_PER_MONTH = 8_000
+HOUSING_IN_EXPENSES = True
+CURRENT_RENT_PER_MONTH = 2_800     # only used when the above is False
+# Actual outgoings over the trailing twelve months, one-offs included. Used as
+# a sanity check on the figure above, not as a model input.
+OBSERVED_SPEND_LAST_12MO = 100_000
+
+# --- Children -------------------------------------------------------------
+# None yet. Birth years are an ASSUMPTION, used only by the schooling
+# dimension; set to [] to drop children from the model entirely.
+KIDS = {'birth_years': [2028, 2030]}
+
+# --- History --------------------------------------------------------------
+# Total assets (excluding card balances) at two dates, so the savings rate can
+# be checked against what the accounts actually did. See validate_savings.py.
+ATTENDING_START = (2024, 8)
+HISTORY = {'start_month': (2024, 3), 'start_value': 300_000.0,
+           'end_month': (2026, 9), 'end_value': 850_000.0}
 
 # --- Local override -------------------------------------------------------
 LOCAL_PATH = os.path.join(HERE, 'inputs.local.json')

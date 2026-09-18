@@ -46,10 +46,11 @@ def net_income(gross, state='nj', pretax=PRETAX_DEFERRAL):
     return gross - fed - payroll - philly - state_tax
 
 
+_fy, _fm = I.SIMONE_FELLOW_END
 PHASES = [
-    ('2026 - Jun 2027  (Simone fellow)',
+    (f'now - {_fy}-{_fm:02d}  (Simone fellow)',
      I.MICHAEL_GROSS + I.SIMONE_FELLOW_GROSS),
-    ('Jul 2027 onward  (Simone attending)',
+    (f'{_fy}-{_fm + 1:02d} onward  (Simone attending)',
      I.MICHAEL_GROSS + I.SIMONE_ATTENDING_GROSS),
 ]
 
@@ -71,12 +72,18 @@ if __name__ == '__main__':
               f'{usd(saved):>11}{saved / net:>6.0%}')
     print(f'\n  "saved" is the net portfolio contribution the simulation would use,')
     print(f'  INCLUDING the {usd(PRETAX_DEFERRAL)} of pre-tax deferrals (they are savings,')
-    print(f'  not spending). Check it against what you actually put away each year.')
+    print(f'  not spending). validate_savings.py checks it against the accounts.')
+    obs = getattr(I, 'OBSERVED_SPEND_LAST_12MO', None)
+    if obs:
+        print(f'\n  Observed outgoings over the trailing twelve months were {usd(obs)},')
+        print(f'  one-offs included, against the {usd(living)}/yr modelled here.')
+        print(f'  Modelling above the recurring run-rate is deliberate: one-offs')
+        print(f'  recur in kind even when no single one repeats.')
 
     print('\n' + '-' * 78)
     print('SENSITIVITY: the two inputs the savings rate is most exposed to')
     print('-' * 78)
-    print(f"{'reading of the $6k/month':<42}{'saved 2026':>13}{'saved 2028+':>14}")
+    print(f"{'reading of the stated monthly spend':<42}{'saved 2026':>13}{'saved 2028+':>14}")
     for label, inc_housing, rent in (
             ('excludes housing, rent $3,000/mo', False, 3_000),
             ('excludes housing, rent $4,000/mo', False, 4_000),
