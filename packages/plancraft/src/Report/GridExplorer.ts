@@ -51,6 +51,13 @@ td.rank-n, th.rank-n { color: var(--muted); width: 40px }
 .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px }
 @media (max-width: 760px) { .charts { grid-template-columns: 1fr } }
 .chart-title { font-size: 13px; color: var(--text-secondary); margin: 0 0 4px }
+.pct-title { font-size: 13.5px; margin: 18px 0 6px }
+table.pct td, table.pct th { padding: 3px 7px }
+table.pct tr.pct-first td, table.pct tr.pct-first th { border-top: 1px solid var(--line) }
+table.pct .key { display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+  margin-right: 6px; vertical-align: middle }
+.pct-note { font-size: 12px; color: var(--muted); margin: 6px 0 0; max-width: 70ch }
+td.dim, .dim { color: var(--muted) }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 12px; color: var(--text-secondary) }
 svg text { fill: var(--text-secondary); font-size: 10px }
 svg .line { fill: none; stroke-width: 2 }
@@ -203,7 +210,10 @@ const EXPLORER_SCRIPT = String.raw`
     var shown = rows.slice(0, MAX_ROWS);
     var head = '<tr><th class="rank-n">#</th>' +
       D.dimensions.map(function (d) { return '<th>' + d.name + '</th>'; }).join('') +
-      '<th>' + m.label + '</th><th>Success</th><th>Ending</th></tr>';
+      '<th>' + m.label + '</th>' +
+      '<th title="5th percentile, first year of retirement">p5</th>' +
+      '<th title="Lowest 5th-percentile monthly spending after retirement">' +
+      'p5 floor</th><th>Success</th><th>Ending</th></tr>';
     var body = shown.map(function (r, i) {
       var sel = state.selected === r.name ? ' aria-selected="true"' : '';
       return '<tr data-combo="' + encodeURIComponent(r.name) + '"' + sel + '>' +
@@ -212,6 +222,8 @@ const EXPLORER_SCRIPT = String.raw`
           return '<td>' + (r.cellNames[d.id] || r.cells[d.id]) + '</td>';
         }).join('') +
         '<td>' + m.fmt(m.get(r)) + '</td>' +
+        '<td class="dim">' + usd(r.p5RetirementSpending) + '</td>' +
+        '<td class="dim">' + usd(r.p5SpendingFloor) + '</td>' +
         '<td>' + (r.successProbability * 100).toFixed(1) + '%</td>' +
         '<td>' + usdCompact(r.endingBalanceP50) + '</td>' +
         '</tr>';
@@ -265,6 +277,21 @@ const EXPLORER_SCRIPT = String.raw`
       svg += '<text x="' + (x(opts.retireIndex) + 4).toFixed(1) + '" y="' +
         (mt + 9) + '">retire</text>';
     }
+    // Band first, so the median lines sit on top of it. A band is the same
+    // entity as its line, not a new series, so it takes that line's hue at the
+    // 10% area-fill wash rather than a colour of its own.
+    points.forEach(function (p, pi) {
+      if (!p.band) return;
+      var up = p.band.hi.map(function (v, i) {
+        return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1);
+      }).join(' ');
+      var down = [];
+      for (var bi = p.band.lo.length - 1; bi >= 0; bi--) {
+        down.push('L' + x(bi).toFixed(1) + ' ' + y(p.band.lo[bi]).toFixed(1));
+      }
+      svg += '<path d="' + up + ' ' + down.join(' ') + ' Z" fill="' +
+        seriesColor(pi) + '" fill-opacity="0.1" stroke="none"/>';
+    });
     points.forEach(function (p, pi) {
       var d = p.values.map(function (v, i) {
         return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1);
@@ -273,8 +300,12 @@ const EXPLORER_SCRIPT = String.raw`
     });
     for (var k = 0; k <= 4; k++) {
       var i2 = Math.round((k / 4) * (n - 1));
+      // The first and last labels sit on the plot edges, so centring them
+      // pushes half the text outside the viewBox and it gets clipped.
+      var anchor = k === 0 ? 'start' : (k === 4 ? 'end' : 'middle');
       svg += '<text x="' + x(i2).toFixed(1) + '" y="' + (H - 8) +
-        '" text-anchor="middle">' + (D.timeline.anchorYear + i2) + '</text>';
+        '" text-anchor="' + anchor + '">' + (D.timeline.anchorYear + i2) +
+        '</text>';
     }
     svg += '<line class="axis" x1="' + ml + '" y1="' + (H - mb) + '" x2="' +
       (W - mr) + '" y2="' + (H - mb) + '"/>';
@@ -315,23 +346,40 @@ const EXPLORER_SCRIPT = String.raw`
       }).join('') + '</table></div>';
 
     var numYears = D.timeline.numYears;
+    // Every condition gets a median line; only the selected one gets a band.
+    // Three overlapping 5th-to-95th washes read as mud, and the question the
+    // band answers -- how wide is the spread in THIS world -- is asked one
+    // condition at a time.
+    var isCurrent = function (x) { return x.run.conditionId === current.conditionId; };
+    var currentConditionName = (byCondition.filter(isCurrent)[0] || byCondition[0])
+      .condition.name;
     var balanceSeries = byCondition.map(function (x) {
-      return { label: x.condition.name, values: x.run.balanceByYear };
+      return {
+        label: x.condition.name, values: x.run.balanceByYear,
+        band: isCurrent(x)
+          ? { lo: x.run.balanceByYearP5, hi: x.run.balanceByYearP95 } : null,
+      };
     });
     var spendingSeries = byCondition.map(function (x) {
-      return { label: x.condition.name, values: x.run.spendingByYear };
+      return {
+        label: x.condition.name, values: x.run.spendingByYear,
+        band: isCurrent(x)
+          ? { lo: x.run.spendingByYearP5, hi: x.run.spendingByYearP95 } : null,
+      };
     });
 
     html += '<div class="charts">';
     var retireIndex = current.retireYear;
-    html += '<div><p class="chart-title">Portfolio balance (median, real)</p>' +
+    html += '<div><p class="chart-title">Portfolio balance (real) \u2014 median lines, ' +
+      'shaded 5th\u201395th percentile for ' + currentConditionName + '</p>' +
       lineChart(balanceSeries, {
         title: 'Portfolio balance by year',
         numYears: numYears,
         retireIndex: retireIndex,
         fmtY: function (v) { return v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'M' : '$' + Math.round(v) + 'k'; },
       }) + '</div>';
-    html += '<div><p class="chart-title">Lifestyle spending (median, real $/mo)</p>' +
+    html += '<div><p class="chart-title">Lifestyle spending (real $/mo) \u2014 median ' +
+      'lines, shaded 5th\u201395th percentile for ' + currentConditionName + '</p>' +
       lineChart(spendingSeries, {
         title: 'Lifestyle spending by year',
         numYears: numYears,
@@ -339,6 +387,43 @@ const EXPLORER_SCRIPT = String.raw`
         fmtY: function (v) { return '$' + Math.round(v / 1000) + 'k'; },
       }) + '</div>';
     html += '</div>';
+
+    // Percentile table. It is the relief for the green series' sub-3:1
+    // contrast against the light surface, and the place to read exact values
+    // off the bands.
+    var anchorYear = D.timeline.anchorYear;
+    var age0 = D.timeline.person1AgeAtAnchor;
+    var marks = [];
+    [0, 5, 10, 15, 20, 25, 30].forEach(function (k) {
+      var idx = current.retireYear + k;
+      if (idx < numYears - 1) marks.push(idx);
+    });
+    html += '<h4 class="pct-title">Lifestyle spending by percentile ($/mo, real)' +
+      '</h4><div class="table-scroll"><table class="num pct"><tr><th>Condition</th>' +
+      '<th>Pct</th>' + marks.map(function (i) {
+        return '<th>age ' + (age0 + i) + '<br><span class="dim">' +
+          (anchorYear + i) + '</span></th>';
+      }).join('') + '</tr>' +
+      byCondition.map(function (x, ci) {
+        var r = x.run;
+        return [['p5', r.spendingByYearP5], ['p50', r.spendingByYear],
+                ['p95', r.spendingByYearP95]].map(function (row, ri) {
+          return '<tr' + (ri === 0 ? ' class="pct-first"' : '') + '>' +
+            (ri === 0
+              ? '<td rowspan="3"><span class="key" style="background:' +
+                seriesColor(ci) + '"></span>' + x.condition.name + '</td>'
+              : '') +
+            '<td class="dim">' + row[0] + '</td>' +
+            marks.map(function (i) {
+              return '<td>' + usd(row[1][i] || 0) + '</td>';
+            }).join('') + '</tr>';
+        }).join('');
+      }).join('') + '</table></div>' +
+      '<p class="pct-note">Rows are the 5th, 50th and 95th percentile of the ' +
+      'simulated runs within each condition. A percentile is a bad or good draw ' +
+      'inside one set of return assumptions; a condition is a different set. ' +
+      'They compound, so the worst case worth planning against is the p5 row of ' +
+      'the pessimistic condition, not either on its own.</p>';
 
     html += '<div class="legend">' + byCondition.map(function (x, i) {
       return '<span><span class="key" style="background:' + seriesColor(i) +

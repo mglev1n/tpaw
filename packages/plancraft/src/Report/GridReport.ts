@@ -49,6 +49,12 @@ export type GridComboResult = {
   // lifestyle spending in $/month. Index 0 is the anchor year.
   balanceByYear: number[]
   spendingByYear: number[]
+  // 5th and 95th percentile of the same two series, for the uncertainty band
+  // in the explorer's detail view. Same quantization as the median.
+  balanceByYearP5: number[]
+  balanceByYearP95: number[]
+  spendingByYearP5: number[]
+  spendingByYearP95: number[]
   // Withdrawal start as a year index into the arrays above. Varies by combo
   // whenever a dimension moves a retirement age.
   retireYear: number
@@ -125,10 +131,14 @@ export const getGridReportData = (
     // retirement) as spending and invert cost comparisons.
     const spending = _medianSeries(outcome.withdrawalsRegular)
     const balance = _medianSeries(outcome.balanceStart)
-    const p5 =
-      outcome.withdrawalsRegular.find((x) => x.percentile === 5)?.data ??
-      outcome.withdrawalsRegular[0]?.data ??
+    const at = (
+      series: { percentile: number; data: number[] }[],
+      percentile: number,
+    ) =>
+      series.find((x) => x.percentile === percentile)?.data ??
+      series[0]?.data ??
       []
+    const p5 = at(outcome.withdrawalsRegular, 5)
     // The final months of the plan taper to zero by construction, so the
     // floor is taken over retirement excluding the last year.
     const p5Retirement = p5.slice(wsMFN, Math.max(wsMFN + 1, p5.length - 12))
@@ -152,6 +162,10 @@ export const getGridReportData = (
           ?.balance ?? 0,
       balanceByYear: byYear(balance, 1 / 1000),
       spendingByYear: byYear(spending, 1),
+      balanceByYearP5: byYear(at(outcome.balanceStart, 5), 1 / 1000),
+      balanceByYearP95: byYear(at(outcome.balanceStart, 95), 1 / 1000),
+      spendingByYearP5: byYear(p5, 1),
+      spendingByYearP95: byYear(at(outcome.withdrawalsRegular, 95), 1),
       retireYear: Math.floor(wsMFN / 12),
     }
   })
