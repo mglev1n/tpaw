@@ -1,0 +1,2345 @@
+{
+  "plancraftGrid": 1,
+  "name": "What the house costs in promised floor",
+  "description": "Housing was held at the $850,000 purchase through both earlier passes, so it was the one large decision they could not price. Price, interest rate, term and down payment are swept ONE AT A TIME from that baseline, because the payment depends on all four jointly while grid dimensions cannot see one another, and a full cross-product would need 48 variants against a cap of eight. Price carries property tax, insurance and maintenance for life; rate and term touch only the interest and only for the term; a larger down payment lowers the payment by removing invested balance. Public K-12 and in-state college, the middle child-cost adder, no legacy. The answer is the highest floor sustainable at 90% confidence.",
+  "base": "base.scenario.json",
+  "dimensions": [
+    {
+      "id": "floor",
+      "name": "Spending floor",
+      "variants": [
+        {
+          "id": "f4",
+          "name": "$4,000/mo floor",
+          "simulation": {
+            "spendingFloor": 4000
+          }
+        },
+        {
+          "id": "f6",
+          "name": "$6,000/mo floor",
+          "simulation": {
+            "spendingFloor": 6000
+          }
+        },
+        {
+          "id": "f8",
+          "name": "$8,000/mo floor",
+          "simulation": {
+            "spendingFloor": 8000
+          }
+        },
+        {
+          "id": "f12",
+          "name": "$12,000/mo floor",
+          "simulation": {
+            "spendingFloor": 12000
+          }
+        },
+        {
+          "id": "f16",
+          "name": "$16,000/mo floor",
+          "simulation": {
+            "spendingFloor": 16000
+          }
+        },
+        {
+          "id": "f20",
+          "name": "$20,000/mo floor",
+          "simulation": {
+            "spendingFloor": 20000
+          }
+        },
+        {
+          "id": "f24",
+          "name": "$24,000/mo floor",
+          "simulation": {
+            "spendingFloor": 24000
+          }
+        },
+        {
+          "id": "f28",
+          "name": "$28,000/mo floor",
+          "simulation": {
+            "spendingFloor": 28000
+          }
+        }
+      ]
+    },
+    {
+      "id": "housing",
+      "name": "House and financing",
+      "variants": [
+        {
+          "id": "p655",
+          "name": "$655k, 30yr 6.5%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 130918
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 39720
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 26832
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "base",
+          "name": "$850k, 30yr 6.5%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 51577
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "p1000",
+          "name": "$1.0M, 30yr 6.5%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 200000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 60679
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40990
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "p1150",
+          "name": "$1.15M, 30yr 6.5%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 230000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 69780
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 47138
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r50",
+          "name": "$850k, 30yr 5.0%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 43805
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r80",
+          "name": "$850k, 30yr 8.0%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 59875
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "y15",
+          "name": "$850k, 15yr 5.9%, 20% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 170000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 68419
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2041,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "d35",
+          "name": "$850k, 30yr 6.5%, 35% down",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (35%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 297500
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 41906
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 34842
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "rent",
+              "label": "Rent until the purchase",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2800
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2027,
+                  "month": 5
+                }
+              }
+            },
+            {
+              "id": "nj-other",
+              "label": "NJ auto insurance and sales tax premium",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 2625
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "kidliving-0",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-1",
+              "label": "Living costs for 2 children at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 4800
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "kidliving-2",
+              "label": "Living costs for 1 child at home",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2400
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-1",
+              "label": "Daycare, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College, child 1",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2046,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2034,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College, child 2",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 35000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2048,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retire",
+      "name": "Retirement age",
+      "variants": [
+        {
+          "id": "r55",
+          "name": "Retire at 55",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 43385
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r60",
+          "name": "Retire at 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 54323
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 62
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r65",
+          "name": "Retire at 65",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (Michael, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (Simone, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            },
+            {
+              "id": "fers",
+              "label": "FERS annuity (7/8 tour, prorated)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perYear": 71786
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 65
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "simone",
+      "name": "Simone's career",
+      "variants": [
+        {
+          "id": "full",
+          "name": "Full time throughout",
+          "events": [
+            {
+              "id": "save-1",
+              "label": "Savings while Simone is a fellow",
+              "kind": "savings",
+              "amount": {
+                "perYear": 198982
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2028,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "save-2",
+              "label": "Savings, Simone full time",
+              "kind": "savings",
+              "amount": {
+                "perYear": 300068
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "homet",
+          "name": "Stay-at-home 2031-40, then back",
+          "events": [
+            {
+              "id": "save-1",
+              "label": "Savings while Simone is a fellow",
+              "kind": "savings",
+              "amount": {
+                "perYear": 198982
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "calendarYear": 2028,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "save-2",
+              "label": "Savings, Simone full time",
+              "kind": "savings",
+              "amount": {
+                "perYear": 300068
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2030,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "save-3",
+              "label": "Savings while Simone is stepped down",
+              "kind": "savings",
+              "amount": {
+                "perYear": 139543
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2031,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "save-4",
+              "label": "Savings after Simone returns full time",
+              "kind": "savings",
+              "amount": {
+                "perYear": 300068
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2041,
+                  "month": 1
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parents",
+      "name": "Simone's parents",
+      "variants": [
+        {
+          "id": "none",
+          "name": "No support needed",
+          "events": []
+        },
+        {
+          "id": "br50",
+          "name": "Brazil care, half share",
+          "events": [
+            {
+              "id": "parents-0",
+              "label": "Parental support 2026-2029",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 3045
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2029,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-1",
+              "label": "Parental support 2030-2033",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 10682
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2033,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-2",
+              "label": "Parental support 2034-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 20500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "us50",
+          "name": "US care, half share",
+          "events": [
+            {
+              "id": "parents-0",
+              "label": "Parental support 2032-2032",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 37753
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-1",
+              "label": "Parental support 2033-2035",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 49744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2033,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "parents-2",
+              "label": "Parental support 2036-2040",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 157744
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2036,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2040,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "severe",
+      "name": "Severe (2%/0.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.02,
+            "bonds": 0.005
+          }
+        }
+      }
+    }
+  ]
+}
