@@ -45,47 +45,79 @@ CONDS = [('base-returns', 'Base'), ('pessimistic', 'Pessimistic'),
 fmt = lambda v: ('none' if v is None else
                  ('>' + usd(BURDENS[-1]) if v >= BURDENS[-1] else usd(v)))
 
+
+def max_floor(cond, income, retire, legacy, burden=0):
+    """Highest floor holdable at 90% with the given extra burden."""
+    prev_f, prev_s = None, None
+    for f in FLOORS:
+        s = ok.get((cond, burden, income, retire, legacy, f))
+        if s is None:
+            continue
+        if s < TARGET:
+            if prev_f is None:
+                return None, s   # cannot even hold the lowest rung
+            return prev_f + (f - prev_f) * (prev_s - TARGET) / (prev_s - s), None
+        prev_f, prev_s = f, s
+    return FLOORS[-1], None
+
+
+ffmt = lambda t: (f'fails {100 * (1 - t[1]):.0f}%' if t[0] is None
+                  else ('>' + usd(FLOORS[-1]) if t[0] >= FLOORS[-1] else usd(t[0])))
+
 print('=' * 98)
-print('EXTRA OBLIGATION ABSORBABLE, 2030-2049, HOLDING A $12,000/MO FLOOR AT 90%')
+print('FIRST: WHAT SOCIAL SECURITY AND FERS ARE ACTUALLY DOING')
 print('=' * 98)
-print('"none" means the floor already fails with no extra burden at all.\n')
+print('Highest floor holdable at 90% with NO extra obligation and no legacy.')
+print('Every earlier result in this project assumed the bottom row of each block.\n')
+for cid, cname in CONDS:
+    print(f'{cname} returns')
+    print(f"{'':<26}" + ''.join(f'{"retire " + str(a):>16}' for a in (55, 60, 65)))
+    for iid, iname in INC:
+        line = f'  {iname:<24}'
+        for rid in ('r55', 'r60', 'r65'):
+            line += f'{ffmt(max_floor(cid, iid, rid, "none")):>16}'
+        print(line)
+    print()
+print('"fails N%" means even a $4,000/mo floor is unaffordable N% of the time.')
+print('')
+print('Read the top row of each block as the plan standing on its own savings.')
+print('Under severe returns it does not reach 90% at ANY floor, at any retirement')
+print('age. The comfort in every earlier table was substantially borrowed from two')
+print('government promises, one of which has never been checked against an')
+print('earnings record.')
+
+print('\n' + '=' * 98)
+print('CAPACITY FOR EXTRA OBLIGATION, 2030-2049, HOLDING $12,000/MO AT 90%')
+print('=' * 98)
+print('"none" means $12,000 already fails before any extra burden is added.\n')
 for lid, lname in (('none', 'No legacy'), ('m5', '$5M real legacy')):
     print(f'{lname}')
-    print(f"{'':<22}" + ''.join(f'{n:>18}' for _c, n in CONDS))
+    print(f"{'':<26}" + ''.join(f'{n:>16}' for _c, n in CONDS))
     for rid, age in (('r55', 55), ('r60', 60), ('r65', 65)):
         for iid, iname in INC:
-            line = f'  {"retire " + str(age) + ", " + iname:<20}'
+            line = f'  {"r" + str(age) + ", " + iname:<24}'
             for cid, _n in CONDS:
-                line += f'{fmt(capacity(cid, iid, rid, lid, 12_000)):>18}'
+                line += f'{fmt(capacity(cid, iid, rid, lid, 12_000)):>16}'
             print(line)
         print()
 
 print('=' * 98)
-print('WHAT SOCIAL SECURITY AND FERS ARE WORTH IN CAPACITY')
+print('CAPACITY AT A FLOOR YOU CAN ACTUALLY HOLD')
 print('=' * 98)
-print('Every earlier result in this project assumed both. This is the difference,')
-print('at a $12,000 floor and no legacy:\n')
-print(f"{'':<16}" + ''.join(f'{n:>20}' for _c, n in CONDS))
-for rid, age in (('r55', 55), ('r60', 60), ('r65', 65)):
-    line = f'  retire {age:<8}'
-    for cid, _n in CONDS:
-        a = capacity(cid, 'neither', rid, 'none', 12_000)
-        b = capacity(cid, 'both', rid, 'none', 12_000)
-        line += (f'{(usd(b - a) + "/yr" if a is not None and b is not None else "n/a"):>20}')
-    print(line)
+print('The $12,000 table is mostly empty because $12,000 is out of reach without')
+print('the government income. At $8,000 -- the structural floor -- there is more')
+print('to say. No legacy.\n')
+for cid, cname in CONDS:
+    print(f'{cname} returns')
+    print(f"{'':<26}" + ''.join(f'{"retire " + str(a):>16}' for a in (55, 60, 65)))
+    for iid, iname in INC:
+        line = f'  {iname:<24}'
+        for rid in ('r55', 'r60', 'r65'):
+            line += f'{fmt(capacity(cid, iid, rid, "none", 8_000)):>16}'
+        print(line)
+    print()
 
-print('\n' + '=' * 98)
-print('CAPACITY BY FLOOR  (own savings only, no legacy, severe returns)')
 print('=' * 98)
-print('Lowering the floor you promise buys capacity for obligations.\n')
-print(f"{'floor':<14}" + ''.join(f'{"retire " + str(a):>16}' for a in (55, 60, 65)))
-for f in FLOORS:
-    line = f'{usd(f) + "/mo":<14}'
-    for rid in ('r55', 'r60', 'r65'):
-        line += f"{fmt(capacity('severe', 'neither', rid, 'none', f)):>16}"
-    print(line)
-
-print('\n' + '=' * 98)
 print('KNOWN COMMITMENTS ON THE SAME SCALE')
 print('=' * 98)
 for label, amt in (('Brazilian care, half share', 20_000),
@@ -94,5 +126,5 @@ for label, amt in (('Brazilian care, half share', 20_000),
                    ('Private college for two (4 yrs)', 190_000),
                    ('US care carried entirely (peak)', 315_000)):
     print(f'  {label:<36}{usd(amt) + "/yr":>14}')
-print('\nCompare each against the capacity tables above to see which retirement')
-print('age and income assumption it requires.')
+print('\nLook each one up against the capacity tables to see which retirement age')
+print('and which income assumption it requires.')
