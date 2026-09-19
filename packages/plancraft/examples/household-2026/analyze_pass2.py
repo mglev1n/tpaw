@@ -26,10 +26,18 @@ for r in rows:
 
 
 def max_floor(curve):
-    """Highest floor sustained at TARGET confidence. None means off-scale."""
+    """Highest floor sustained at TARGET confidence.
+
+    A combination can fail to reach TARGET at ANY floor, including the
+    lowest rung. That is not "the answer is below the ladder" -- it means
+    the floor is not the binding constraint. The essential expenses (house
+    carrying costs, college, parental support) are themselves unaffordable
+    in the bad tail, and cutting lifestyle spending to nothing cannot
+    rescue the plan. So that case returns the CEILING: the best success
+    achievable at any floor, which is what actually describes it."""
     pts = sorted(curve.items())
     if pts[0][1] < TARGET:
-        return None, 'below'
+        return max(curve.values()), 'ceiling'
     if pts[-1][1] >= TARGET:
         return None, 'above'
     for (f0, s0), (f1, s1) in zip(pts, pts[1:]):
@@ -37,7 +45,7 @@ def max_floor(curve):
             if s0 == s1:
                 return f0, 'ok'
             return f0 + (f1 - f0) * (s0 - TARGET) / (s0 - s1), 'ok'
-    return None, 'below'
+    return max(curve.values()), 'ceiling'
 
 
 solved = {}
@@ -46,7 +54,7 @@ for key, curve in by.items():
 
 fmt = lambda v: (usd(v[0]) if v[1] == 'ok'
                  else ('>' + usd(FLOORS[-1]) if v[1] == 'above'
-                       else '<' + usd(FLOORS[0])))
+                       else f'max {100 * v[0]:.0f}%'))
 CONDS = [('base-returns', 'Base'), ('pessimistic', 'Pessimistic'),
          ('severe', 'Severe')]
 SIMONE = [('full', 'Simone full time'), ('p50p', '0.5 FTE permanent'),
@@ -61,7 +69,9 @@ PARENTS = [('none', 'No support'), ('br50', 'Brazil, half'),
 print('=' * 94)
 print(f'HIGHEST FLOOR SUSTAINED AT {TARGET:.0%} CONFIDENCE  ($/mo, real)')
 print('=' * 94)
-print('Public K-12 + in-state college, no legacy, severe returns unless stated.\n')
+print('Public K-12 + in-state college, no legacy, severe returns.')
+print('"max N%" means 90% is unreachable at ANY floor: lifestyle spending is not')
+print('the binding constraint, the essential expenses are.\n')
 print(f"{'':<30}" + ''.join(f'{n:>16}' for _p, n in PARENTS))
 for rid, age in (('r55', 55), ('r60', 60), ('r65', 65)):
     print(f'\nRetire at {age}')
