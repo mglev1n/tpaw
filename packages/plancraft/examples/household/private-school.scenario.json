@@ -1,0 +1,17 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Private school",
+    "description": "Base plus K-12 private school tuition for one child, kindergarten 2032 through 12th grade 2045."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "events": [
+    {
+      "id": "private-school",
+      "label": "Private school tuition",
+      "kind": "expenseEssential",
+      "amount": { "perYear": 40000 },
+      "timing": { "from": { "calendarYear": 2032, "month": 9 }, "to": { "calendarYear": 2045, "month": 6 } }
+    }
+  ]
+}

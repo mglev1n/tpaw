@@ -1,0 +1,45 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "$900k, 20% down",
+    "description": "Down payment $180k (20%), mortgage $720k: +$1391/mo P&I vs the $500k-mortgage reference (nominal, 30y)."
+  },
+  "composition": {
+    "extends": "../house-price/sweep-base.scenario.json"
+  },
+  "events": [
+    {
+      "id": "house-down-payment",
+      "label": "House down payment (20%)",
+      "kind": "expenseEssential",
+      "amount": {
+        "oneTime": 180000
+      },
+      "timing": {
+        "at": {
+          "calendarYear": 2027,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "extra-mortgage",
+      "label": "Extra mortgage P&I vs reference",
+      "kind": "expenseEssential",
+      "nominal": true,
+      "amount": {
+        "perMonth": 1391
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "calendarYear": 2057,
+          "month": 6
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Base + $5M legacy",
+    "description": "Household base with a $5M (real dollars) bequest target. TPAW amortizes toward the legacy instead of to zero, reducing retirement spending."
+  },
+  "composition": { "extends": "../base.scenario.json" },
+  "simulation": { "legacy": 5000000 }
+}

@@ -1,0 +1,9 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Private school + $5M legacy",
+    "description": "K-12 private school tuition plus a $5M bequest target."
+  },
+  "composition": { "extends": "../private-school.scenario.json" },
+  "simulation": { "legacy": 5000000 }
+}

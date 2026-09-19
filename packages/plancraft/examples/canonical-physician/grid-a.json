@@ -1,0 +1,744 @@
+{
+  "plancraftGrid": 1,
+  "name": "Household A - dual income, moderate debt: what actually moves the needle",
+  "description": "Two 35-year-olds two years out of training. Household gross ~$410k (physician ~$325k + spouse ~$85k), ~$270,000 net. $150,000 invested. Real income held flat. Ranks five recurring decisions by their effect on retirement living standard. Savings figures are net investable savings before the student loan, housing and education obligations modeled here as essential expenses, so present-day discretionary consumption is net income minus savings. Both spouses earn, so each claims their own benefit at 70, scaled down at earlier retirement ages for the shorter earnings record. Children are born 2027/2029/2031; 529 funding runs birth to 18, private K-12 ages 5-18, the college top-up ages 18-22. Housing is the annual cost increment over a modest house on a 30-year mortgage from 2027. The metric is median first-year general (lifestyle) retirement spending, which excludes earmarked essential expenses. Investment costs live in the companion fees grid, because fee drag is a return reduction and would collide with the return conditions. Because house, schooling and loan payments compete with savings for the same net income, some combinations are budget-infeasible; analyze.js reports matched effect sizes over the feasible region. Real 2026 dollars, net of tax; representative rather than anyone actual.",
+  "base": "base-a.scenario.json",
+  "dimensions": [
+    {
+      "id": "savings",
+      "name": "Savings rate / lifestyle creep",
+      "variants": [
+        {
+          "id": "hyper",
+          "name": "Hyper-saver (41% of net)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 111000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "high",
+          "name": "High (31%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 84000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "moderate",
+          "name": "Moderate (23%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 62000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "creep",
+          "name": "Creeping (31% falling 2%/yr)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 84000
+              },
+              "growth": {
+                "annualPercent": -2.0
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retire",
+      "name": "Retirement age",
+      "variants": [
+        {
+          "id": "r55",
+          "name": "Retire at 55",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r60",
+          "name": "Retire at 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3800
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2350
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r65",
+          "name": "Retire at 65",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4200
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2600
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r70",
+          "name": "Retire at 70",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 70
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 70
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 2700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "loans",
+      "name": "Student loan payoff",
+      "variants": [
+        {
+          "id": "aggressive",
+          "name": "Aggressive (5 yr)",
+          "events": [
+            {
+              "id": "loans",
+              "label": "Student loan payments",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 48000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2030,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "name": "Standard (10 yr)",
+          "events": [
+            {
+              "id": "loans",
+              "label": "Student loan payments",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 29000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "idr",
+          "name": "Income-driven (20 yr)",
+          "events": [
+            {
+              "id": "loans",
+              "label": "Student loan payments",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 19000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "housing",
+      "name": "House size",
+      "variants": [
+        {
+          "id": "modest",
+          "name": "Modest (~$550k)",
+          "events": []
+        },
+        {
+          "id": "typical",
+          "name": "Typical (~$850k)",
+          "events": [
+            {
+              "id": "housing",
+              "label": "Housing cost above baseline",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 14000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "doctor",
+          "name": "Doctor house (~$1.3M)",
+          "events": [
+            {
+              "id": "housing",
+              "label": "Housing cost above baseline",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 30000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Children and schooling",
+      "variants": [
+        {
+          "id": "two-public",
+          "name": "2 kids, public school",
+          "events": [
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "two-private",
+          "name": "2 kids, private K-12 + college",
+          "events": [
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "k12-1",
+              "label": "Private K-12 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 30000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "college-1",
+              "label": "College top-up (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 25000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2045,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "k12-2",
+              "label": "Private K-12 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 30000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "college-2",
+              "label": "College top-up (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 25000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2047,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2051,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "three-public",
+          "name": "3 kids, public school",
+          "events": [
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-3",
+              "label": "529 (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2031,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "optimistic",
+      "name": "Optimistic (6.5%/3%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.065,
+            "bonds": 0.03
+          }
+        }
+      }
+    }
+  ]
+}

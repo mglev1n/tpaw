@@ -4,7 +4,11 @@ pub mod process_plan_params_server;
 pub mod simulation_result;
 
 use self::process_plan_params_server::process_plan_params_server;
-use crate::cuda_bridge::{cuda_simulate, PlanParamsCuda_C_Arrays, ResultCudaArrays};
+#[cfg(feature = "cuda")]
+use crate::cuda_bridge::cuda_simulate;
+use crate::cuda_bridge::{PlanParamsCuda_C_Arrays, ResultCudaArrays};
+#[cfg(not(feature = "cuda"))]
+use crate::sim_cpu::cpu_simulate as cuda_simulate;
 use crate::cuda_bridge_utils::f_cuda;
 use crate::market_data::market_data_defs::MarketDataSeriesForSimulation;
 use crate::shared_types::StocksAndBonds;

@@ -1,0 +1,57 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Household base",
+    "description": "Two-physician household, Philadelphia. Investable portfolio only (house down-payment cash tracked separately). Fellowship through mid-2028, then attending income. 529 funding from 2028. Both retire at 60 in the base case.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": { "years": 37 },
+      "retirementAge": { "years": 60 },
+      "maxAge": { "years": 95 }
+    },
+    "person2": {
+      "currentAge": { "years": 38 },
+      "retirementAge": { "years": 60 },
+      "maxAge": { "years": 95 }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": { "balance": 621283 },
+  "events": [
+    {
+      "id": "save-fellowship-years",
+      "label": "Savings (fellowship years)",
+      "kind": "savings",
+      "amount": { "perYear": 120000 },
+      "timing": { "from": { "named": "now" }, "to": { "calendarYear": 2028, "month": 6 } }
+    },
+    {
+      "id": "save-attending-years",
+      "label": "Savings (attending years)",
+      "kind": "savings",
+      "amount": { "perYear": 160000 },
+      "timing": { "from": { "calendarYear": 2028, "month": 7 }, "to": { "named": "lastWorkingMonth" } }
+    },
+    {
+      "id": "daycare",
+      "label": "Daycare",
+      "kind": "expenseEssential",
+      "amount": { "perMonth": 2200 },
+      "timing": { "from": { "calendarYear": 2028 }, "durationYears": 4.5 }
+    },
+    {
+      "id": "college-fund",
+      "label": "529 contributions",
+      "kind": "expenseEssential",
+      "amount": { "perMonth": 1300 },
+      "timing": { "from": { "calendarYear": 2028 }, "to": { "calendarYear": 2045, "month": 8 } }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": { "fixed": { "stocks": 0.05, "bonds": 0.02 } },
+    "inflation": { "manual": 0.024 },
+    "sampling": { "type": "monteCarlo", "numRuns": 2000, "seed": 1776 }
+  }
+}

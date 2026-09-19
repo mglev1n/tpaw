@@ -3,11 +3,15 @@ use std::{
     io::{Read, Result},
 };
 fn main() -> Result<()> {
-    println!("cargo:rustc-link-search=native=/usr/local/cuda/lib64");
-    println!("cargo:rustc-link-search=native=/usr/local/lib");
-    println!("cargo:rustc-link-lib=dylib=cudart");
-    println!("cargo:rustc-link-lib=dylib=cublas");
-    println!("cargo:rustc-link-lib=dylib=simulator-cuda");
+    // CUDA libraries are linked only with the "cuda" feature; the default
+    // build uses the pure-Rust CPU backend (src/lib/sim_cpu).
+    if std::env::var("CARGO_FEATURE_CUDA").is_ok() {
+        println!("cargo:rustc-link-search=native=/usr/local/cuda/lib64");
+        println!("cargo:rustc-link-search=native=/usr/local/lib");
+        println!("cargo:rustc-link-lib=dylib=cudart");
+        println!("cargo:rustc-link-lib=dylib=cublas");
+        println!("cargo:rustc-link-lib=dylib=simulator-cuda");
+    }
 
     handle_proto_template("src/lib/wire/wire_common.proto.template");
     handle_proto_template("src/lib/wire/wire_simulate_api.proto.template");

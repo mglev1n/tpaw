@@ -1,0 +1,81 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "$750k, 20% down",
+    "description": "Down payment $150k (20%), mortgage $600k: +$632/mo P&I vs the $500k-mortgage reference (nominal, 30y), −$300/mo tax/ins/maint (real)."
+  },
+  "composition": {
+    "extends": "../house-price/sweep-base.scenario.json"
+  },
+  "events": [
+    {
+      "id": "house-down-payment",
+      "label": "House down payment (20%)",
+      "kind": "expenseEssential",
+      "amount": {
+        "oneTime": 150000
+      },
+      "timing": {
+        "at": {
+          "calendarYear": 2027,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "extra-mortgage",
+      "label": "Extra mortgage P&I vs reference",
+      "kind": "expenseEssential",
+      "nominal": true,
+      "amount": {
+        "perMonth": 632
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "calendarYear": 2057,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "carry-saving-work",
+      "label": "Lower tax/ins/maint vs reference",
+      "kind": "savings",
+      "amount": {
+        "perMonth": 300
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 7
+        },
+        "to": {
+          "named": "lastWorkingMonth",
+          "person": "person1"
+        }
+      }
+    },
+    {
+      "id": "carry-saving-ret",
+      "label": "Lower tax/ins/maint (retired)",
+      "kind": "retirementIncome",
+      "amount": {
+        "perMonth": 300
+      },
+      "timing": {
+        "from": {
+          "named": "retirement",
+          "person": "person1"
+        },
+        "to": {
+          "named": "maxAge",
+          "person": "person1"
+        }
+      }
+    }
+  ]
+}

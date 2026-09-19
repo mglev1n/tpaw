@@ -1,0 +1,31 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Example: buy house 2031",
+    "description": "Base plus a $300k down payment in 2031 and lower savings afterward (mortgage payments)."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "events": [
+    {
+      "id": "house-down-payment",
+      "label": "House down payment",
+      "kind": "expenseEssential",
+      "amount": { "oneTime": 300000 },
+      "timing": { "at": { "calendarYear": 2031, "month": 6 } }
+    },
+    {
+      "id": "save",
+      "label": "Annual savings (reduced by mortgage)",
+      "kind": "savings",
+      "amount": { "perYear": 60000 },
+      "timing": { "from": { "named": "now" }, "to": { "calendarYear": 2031, "month": 5 } }
+    },
+    {
+      "id": "save-post-house",
+      "label": "Annual savings after house",
+      "kind": "savings",
+      "amount": { "perYear": 36000 },
+      "timing": { "from": { "calendarYear": 2031, "month": 6 }, "to": { "named": "lastWorkingMonth" } }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Household B - single earner, heavy debt",
+    "description": "A 38-year-old surgeon out of a long training path, sole earner. Gross ~$600k, ~$370,000 net. $50,000 invested -- a late start with a large balance outstanding. Real income held flat. All figures are real 2026 dollars, net of tax. Savings, student loans, housing and education are grid dimensions.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 38
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 38
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 50000
+  },
+  "events": [],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}

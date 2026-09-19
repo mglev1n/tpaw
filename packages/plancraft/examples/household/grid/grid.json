@@ -1,0 +1,793 @@
+{
+  "plancraftGrid": 1,
+  "name": "Accumulation decision grid",
+  "description": "Full factorial over career (Michael, switch mid-2029), spouse work pattern, family size and schooling, and state of residence. Base: house purchased June 2027, savings growing 2.5%/yr real, $5M legacy target. All amounts real, after-tax; NJ modeled as a $9,500/yr net drag during working years (retirement-account and HSA non-conformity plus property-tax delta, per the household plan doc §5.3) - post-retirement state tax differences are not modeled.",
+  "base": "grid-base.scenario.json",
+  "dimensions": [
+    {
+      "id": "career",
+      "name": "Michael's career",
+      "variants": [
+        {
+          "id": "academic",
+          "name": "Academic",
+          "events": []
+        },
+        {
+          "id": "industry",
+          "name": "Industry (+$100k net)",
+          "events": [
+            {
+              "id": "save-career-boost",
+              "label": "Industry income boost",
+              "kind": "savings",
+              "amount": {
+                "perYear": 100000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "private-practice",
+          "name": "Private practice (+$180k net)",
+          "events": [
+            {
+              "id": "save-career-boost",
+              "label": "Private practice income boost",
+              "kind": "savings",
+              "amount": {
+                "perYear": 180000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "earners",
+      "name": "Spouse work pattern",
+      "variants": [
+        {
+          "id": "both-full",
+          "name": "Works to 60",
+          "events": []
+        },
+        {
+          "id": "half-2038",
+          "name": "Half-time from 2038",
+          "events": [
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "save-spouse-half",
+              "label": "Savings (spouse, half-time)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 57500
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2038,
+                  "month": 1
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "stops-2038",
+          "name": "Stops 2038",
+          "events": [
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2037,
+                  "month": 12
+                }
+              }
+            }
+          ],
+          "household": {
+            "person2": {
+              "currentAge": {
+                "years": 38
+              },
+              "retirementAge": {
+                "years": 50
+              },
+              "maxAge": {
+                "years": 95
+              }
+            }
+          }
+        },
+        {
+          "id": "stops-2033",
+          "name": "Stops 2033",
+          "events": [
+            {
+              "id": "save-spouse",
+              "label": "Savings (spouse)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": 2.5
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "calendarYear": 2032,
+                  "month": 12
+                }
+              }
+            }
+          ],
+          "household": {
+            "person2": {
+              "currentAge": {
+                "years": 38
+              },
+              "retirementAge": {
+                "years": 45
+              },
+              "maxAge": {
+                "years": 95
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "family",
+      "name": "Family",
+      "variants": [
+        {
+          "id": "kids1-public",
+          "name": "1 kid, public school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kids1-private",
+          "name": "1 kid, private school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-1",
+              "label": "Private school (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kids2-public",
+          "name": "2 kids, public school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kids2-private",
+          "name": "2 kids, private school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-1",
+              "label": "Private school (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-2",
+              "label": "Private school (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kids3-public",
+          "name": "3 kids, public school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-3",
+              "label": "Daycare (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-3",
+              "label": "529 (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2031,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kids3-private",
+          "name": "3 kids, private school",
+          "events": [
+            {
+              "id": "daycare-1",
+              "label": "Daycare (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-1",
+              "label": "Private school (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-2",
+              "label": "Daycare (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2030,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-2",
+              "label": "Private school (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2034,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "daycare-3",
+              "label": "Daycare (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 2200
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2032,
+                  "month": 1
+                },
+                "durationYears": 4.5
+              }
+            },
+            {
+              "id": "c529-3",
+              "label": "529 (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 1300
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2031,
+                  "month": 6
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "school-3",
+              "label": "Private school (child 3)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 40000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2036,
+                  "month": 9
+                },
+                "to": {
+                  "calendarYear": 2049,
+                  "month": 6
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "state",
+      "name": "State",
+      "variants": [
+        {
+          "id": "pa",
+          "name": "PA (Philadelphia)",
+          "events": []
+        },
+        {
+          "id": "nj",
+          "name": "NJ (from 2027)",
+          "events": [
+            {
+              "id": "nj-tax-drag",
+              "label": "NJ tax drag",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 9500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

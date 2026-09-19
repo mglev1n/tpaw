@@ -1,0 +1,553 @@
+{
+  "plancraftGrid": 1,
+  "name": "House price at $525-575k gross with a 2028 income step",
+  "description": "Two 37-year-olds, no student debt, $400,000 invested plus down-payment cash. One attending plus one fellow saving $110,000/yr until Jun 2028, then both attending at $525,000 or $575,000 gross (~$364,000 and ~$394,000 net of federal, PA and payroll tax for a married couple with two earners above the Social Security wage base). Income and savings rate are one dimension because the engine takes net contributions -- income reaches the simulation only through savings, so varying them separately would credit a raise that never appears. House bought 2027, 20% down, 30-year fixed at 6.5%; property tax 1.6%, insurance 0.4%, maintenance 1.0% of value. Principal and interest is NOMINAL and erodes in real terms; tax, insurance and maintenance are real and continue for life. All variants start from the same balance sheet so the cheaper house is not credited twice. Metric is median first-year general (lifestyle) retirement spending, which excludes the housing costs themselves. Home equity is not counted in the portfolio.",
+  "base": "base-step.scenario.json",
+  "dimensions": [
+    {
+      "id": "house",
+      "name": "House price",
+      "variants": [
+        {
+          "id": "h700",
+          "name": "$700k house",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 140000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 42475
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 21000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "h900",
+          "name": "$900k house",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 180000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 54611
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 27000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "h1000",
+          "name": "$1000k house",
+          "events": [
+            {
+              "id": "house-down",
+              "label": "Down payment (20%)",
+              "kind": "expenseEssential",
+              "amount": {
+                "oneTime": 200000
+              },
+              "timing": {
+                "at": {
+                  "calendarYear": 2027,
+                  "month": 6
+                }
+              }
+            },
+            {
+              "id": "house-pi",
+              "label": "Mortgage principal and interest",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 60679
+              },
+              "nominal": true,
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "house-carry",
+              "label": "Property tax, insurance, maintenance",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 30000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "income",
+      "name": "Income and savings rate",
+      "variants": [
+        {
+          "id": "g525-hi",
+          "name": "$525k gross, save $153k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 153000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "g525-mid",
+          "name": "$525k gross, save $120k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 120000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "g525-lo",
+          "name": "$525k gross, save $87k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 87000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "g575-hi",
+          "name": "$575k gross, save $165k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 165000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "g575-mid",
+          "name": "$575k gross, save $130k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 130000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "g575-lo",
+          "name": "$575k gross, save $95k",
+          "events": [
+            {
+              "id": "save-phase2",
+              "label": "Savings (both attending)",
+              "kind": "savings",
+              "amount": {
+                "perYear": 95000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2028,
+                  "month": 7
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retire",
+      "name": "Retirement age",
+      "variants": [
+        {
+          "id": "r55",
+          "name": "Retire at 55",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (person 1, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3700
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (person 2, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3300
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r60",
+          "name": "Retire at 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (person 1, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4100
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (person 2, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3600
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r65",
+          "name": "Retire at 65",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (person 1, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4500
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (person 2, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3900
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "pessimistic",
+      "name": "Pessimistic (3.5%/1.5%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.035,
+            "bonds": 0.015
+          }
+        }
+      }
+    },
+    {
+      "id": "base-returns",
+      "name": "Base (5%/2%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.05,
+            "bonds": 0.02
+          }
+        }
+      }
+    },
+    {
+      "id": "optimistic",
+      "name": "Optimistic (6.5%/3%)",
+      "simulation": {
+        "expectedReturns": {
+          "fixed": {
+            "stocks": 0.065,
+            "bonds": 0.03
+          }
+        }
+      }
+    }
+  ]
+}

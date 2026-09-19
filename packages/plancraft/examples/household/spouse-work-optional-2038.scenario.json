@@ -1,0 +1,31 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Spouse stops working 2038",
+    "description": "Base, but person2 retires at age 50 (2038). Household savings drop to a single-earner surplus from 2038."
+  },
+  "composition": { "extends": "base.scenario.json" },
+  "household": {
+    "person2": {
+      "currentAge": { "years": 38 },
+      "retirementAge": { "years": 50 },
+      "maxAge": { "years": 95 }
+    }
+  },
+  "events": [
+    {
+      "id": "save-attending-years",
+      "label": "Savings (two attendings)",
+      "kind": "savings",
+      "amount": { "perYear": 160000 },
+      "timing": { "from": { "calendarYear": 2028, "month": 7 }, "to": { "calendarYear": 2037, "month": 12 } }
+    },
+    {
+      "id": "save-single-earner",
+      "label": "Savings (single earner)",
+      "kind": "savings",
+      "amount": { "perYear": 45000 },
+      "timing": { "from": { "calendarYear": 2038 }, "to": { "named": "lastWorkingMonth", "person": "person1" } }
+    }
+  ]
+}

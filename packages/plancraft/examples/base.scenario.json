@@ -1,0 +1,37 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Example base",
+    "description": "A simple single-earner household saving toward retirement at 60.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": { "years": 40 },
+      "retirementAge": { "years": 60 },
+      "maxAge": { "years": 95 }
+    }
+  },
+  "portfolio": { "balance": 400000 },
+  "events": [
+    {
+      "id": "save",
+      "label": "Annual savings",
+      "kind": "savings",
+      "amount": { "perYear": 60000 },
+      "timing": { "from": { "named": "now" }, "to": { "named": "lastWorkingMonth" } }
+    },
+    {
+      "id": "social-security",
+      "label": "Social Security at 70",
+      "kind": "retirementIncome",
+      "amount": { "perMonth": 3200 },
+      "timing": { "from": { "age": { "years": 70 } }, "to": { "named": "maxAge" } }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": { "fixed": { "stocks": 0.05, "bonds": 0.02 } },
+    "inflation": { "manual": 0.024 },
+    "sampling": { "type": "monteCarlo", "numRuns": 2000, "seed": 1776 }
+  }
+}

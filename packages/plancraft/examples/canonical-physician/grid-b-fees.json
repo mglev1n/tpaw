@@ -1,0 +1,485 @@
+{
+  "plancraftGrid": 1,
+  "name": "Household B - single earner, heavy debt: the cost of investment costs",
+  "description": "Companion isolating fee drag for Household B - single earner, heavy debt, modeled as a permanent reduction in expected return (5.0%/2.0% gross less the stated fee). Crossed against savings rate and retirement age so the fee effect reads against the two decisions known to dominate. Other decisions held at standard loans, typical house, two children in public school.",
+  "base": "base-b.scenario.json",
+  "dimensions": [
+    {
+      "id": "fees",
+      "name": "Investment costs",
+      "variants": [
+        {
+          "id": "diy",
+          "name": "DIY index (0.05%)",
+          "simulation": {
+            "expectedReturns": {
+              "fixed": {
+                "stocks": 0.0495,
+                "bonds": 0.0195
+              }
+            }
+          }
+        },
+        {
+          "id": "lowcost",
+          "name": "Low-cost advisor (0.40%)",
+          "simulation": {
+            "expectedReturns": {
+              "fixed": {
+                "stocks": 0.046,
+                "bonds": 0.016
+              }
+            }
+          }
+        },
+        {
+          "id": "typical",
+          "name": "Typical AUM (0.75%)",
+          "simulation": {
+            "expectedReturns": {
+              "fixed": {
+                "stocks": 0.0425,
+                "bonds": 0.0125
+              }
+            }
+          }
+        },
+        {
+          "id": "full",
+          "name": "Full-service AUM (1.10%)",
+          "simulation": {
+            "expectedReturns": {
+              "fixed": {
+                "stocks": 0.039,
+                "bonds": 0.009
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "savings",
+      "name": "Savings rate / lifestyle creep",
+      "variants": [
+        {
+          "id": "hyper",
+          "name": "Hyper-saver (41% of net)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 152000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "high",
+          "name": "High (31%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "moderate",
+          "name": "Moderate (23%)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 85000
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "creep",
+          "name": "Creeping (31% falling 2%/yr)",
+          "events": [
+            {
+              "id": "save",
+              "label": "Net investable savings",
+              "kind": "savings",
+              "amount": {
+                "perYear": 115000
+              },
+              "growth": {
+                "annualPercent": -2.0
+              },
+              "timing": {
+                "from": {
+                  "named": "now"
+                },
+                "to": {
+                  "named": "lastWorkingMonth",
+                  "person": "person1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retire",
+      "name": "Retirement age",
+      "variants": [
+        {
+          "id": "r55",
+          "name": "Retire at 55",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 55
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 55
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 3600
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 1500
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r60",
+          "name": "Retire at 60",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 60
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 60
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4000
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 1650
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r65",
+          "name": "Retire at 65",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 65
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 65
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4400
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 1800
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "r70",
+          "name": "Retire at 70",
+          "household": {
+            "person1": {
+              "retirementAge": {
+                "years": 70
+              }
+            },
+            "person2": {
+              "retirementAge": {
+                "years": 70
+              }
+            }
+          },
+          "events": [
+            {
+              "id": "ss-1",
+              "label": "Social Security (earner, at 70)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 4600
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person1",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person1"
+                }
+              }
+            },
+            {
+              "id": "ss-2",
+              "label": "Social Security (spouse)",
+              "kind": "retirementIncome",
+              "amount": {
+                "perMonth": 1850
+              },
+              "timing": {
+                "from": {
+                  "age": {
+                    "person": "person2",
+                    "years": 70
+                  }
+                },
+                "to": {
+                  "named": "maxAge",
+                  "person": "person2"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fixed",
+      "name": "Other decisions (held fixed)",
+      "variants": [
+        {
+          "id": "standard",
+          "name": "Standard loans, typical house, 2 kids public",
+          "events": [
+            {
+              "id": "loans",
+              "label": "Student loan payments",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 56000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2026,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2035,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "housing",
+              "label": "Housing cost above baseline",
+              "kind": "expenseEssential",
+              "amount": {
+                "perYear": 20000
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2056,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-1",
+              "label": "529 (child 1)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2027,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2045,
+                  "month": 12
+                }
+              }
+            },
+            {
+              "id": "c529-2",
+              "label": "529 (child 2)",
+              "kind": "expenseEssential",
+              "amount": {
+                "perMonth": 500
+              },
+              "timing": {
+                "from": {
+                  "calendarYear": 2029,
+                  "month": 1
+                },
+                "to": {
+                  "calendarYear": 2047,
+                  "month": 12
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

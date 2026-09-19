@@ -1,0 +1,54 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "House price question: $400k gross, dual earner, no debt",
+    "description": "Two 37-year-olds, $400,000 gross (~$292,000 net), no debt, $400,000 invested plus the down payment held in cash. House bought 2027 with 20% down on a 30-year fixed at 6.5%. Real 2026 dollars, net of tax.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 400000
+  },
+  "events": [],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}

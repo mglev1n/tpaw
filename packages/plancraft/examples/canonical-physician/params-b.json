@@ -1,0 +1,72 @@
+{
+  "key": "b",
+  "label": "Household B - single earner, heavy debt",
+  "currentAge": 38,
+  "netIncome": 370000,
+  "portfolio": 50000,
+  "savings": {
+    "hyper": [
+      152000,
+      0.0
+    ],
+    "high": [
+      115000,
+      0.0
+    ],
+    "moderate": [
+      85000,
+      0.0
+    ],
+    "creep": [
+      115000,
+      -2.0
+    ]
+  },
+  "loans": {
+    "aggressive": [
+      97000,
+      5
+    ],
+    "standard": [
+      56000,
+      10
+    ],
+    "idr": [
+      37000,
+      20
+    ]
+  },
+  "housing": {
+    "modest": 0,
+    "typical": 20000,
+    "doctor": 44000
+  },
+  "education": {
+    "two-public": [
+      2,
+      false
+    ],
+    "two-private": [
+      2,
+      true
+    ],
+    "three-public": [
+      3,
+      false
+    ]
+  },
+  "retire": {
+    "r55": 55,
+    "r60": 60,
+    "r65": 65,
+    "r70": 70
+  },
+  "kidBirth": [
+    2027,
+    2029,
+    2031
+  ],
+  "fivetwonine": 6000,
+  "privateK12": 30000,
+  "collegeTopUp": 25000
+}

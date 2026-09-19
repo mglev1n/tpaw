@@ -1,0 +1,112 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Parental support at $500k gross",
+    "description": "Two 37-year-olds, $500,000 gross, both working in Philadelphia, no student debt, retiring at 65. Real 2026 dollars, net of tax.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 65
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 635989.0
+  },
+  "events": [
+    {
+      "id": "save",
+      "label": "Net investable savings",
+      "kind": "savings",
+      "amount": {
+        "perYear": 103000
+      },
+      "timing": {
+        "from": {
+          "named": "now"
+        },
+        "to": {
+          "named": "lastWorkingMonth",
+          "person": "person1"
+        }
+      }
+    },
+    {
+      "id": "ss-1",
+      "label": "Social Security (person 1, at 70)",
+      "kind": "retirementIncome",
+      "amount": {
+        "perMonth": 4400
+      },
+      "timing": {
+        "from": {
+          "age": {
+            "person": "person1",
+            "years": 70
+          }
+        },
+        "to": {
+          "named": "maxAge",
+          "person": "person1"
+        }
+      }
+    },
+    {
+      "id": "ss-2",
+      "label": "Social Security (person 2, at 70)",
+      "kind": "retirementIncome",
+      "amount": {
+        "perMonth": 3800
+      },
+      "timing": {
+        "from": {
+          "age": {
+            "person": "person2",
+            "years": 70
+          }
+        },
+        "to": {
+          "named": "maxAge",
+          "person": "person2"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}

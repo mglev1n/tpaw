@@ -1,0 +1,90 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "Household 2026",
+    "description": "Two physicians in Philadelphia buying in Cherry Hill in 2027. Savings is derived from income less tax less living costs, not set as a rate. Real 2026 dollars, after tax.",
+    "anchorYear": 2026
+  },
+  "household": {
+    "person1": {
+      "currentAge": {
+        "years": 37
+      },
+      "retirementAge": {
+        "years": 60
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "person2": {
+      "currentAge": {
+        "years": 38
+      },
+      "retirementAge": {
+        "years": 60
+      },
+      "maxAge": {
+        "years": 95
+      }
+    },
+    "withdrawalStart": "person1"
+  },
+  "portfolio": {
+    "balance": 878465
+  },
+  "events": [
+    {
+      "id": "save-1",
+      "label": "Savings while Simone is a fellow",
+      "kind": "savings",
+      "amount": {
+        "perYear": 198982
+      },
+      "timing": {
+        "from": {
+          "named": "now"
+        },
+        "to": {
+          "calendarYear": 2028,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "save-2",
+      "label": "Savings once Simone is an attending",
+      "kind": "savings",
+      "amount": {
+        "perYear": 300068
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2028,
+          "month": 7
+        },
+        "to": {
+          "named": "lastWorkingMonth",
+          "person": "person1"
+        }
+      }
+    }
+  ],
+  "simulation": {
+    "expectedReturns": {
+      "fixed": {
+        "stocks": 0.05,
+        "bonds": 0.02
+      }
+    },
+    "inflation": {
+      "manual": 0.024
+    },
+    "sampling": {
+      "type": "monteCarlo",
+      "numRuns": 2000,
+      "seed": 1776
+    },
+    "legacy": 0
+  }
+}

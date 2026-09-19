@@ -1,0 +1,78 @@
+{
+  "plancraft": 1,
+  "meta": {
+    "name": "House price sweep base",
+    "description": "Grid base (academic career, both work to 60, PA, $5M legacy) plus 2 kids public school. The base savings implicitly assume a $900k purchase ($400k down June 2027, ~$500k mortgage); price variants add or subtract carrying-cost deltas vs that reference."
+  },
+  "composition": {
+    "extends": "../grid/grid-base.scenario.json"
+  },
+  "events": [
+    {
+      "id": "daycare-1",
+      "label": "Daycare (child 1)",
+      "kind": "expenseEssential",
+      "amount": {
+        "perMonth": 2200
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2028,
+          "month": 1
+        },
+        "durationYears": 4.5
+      }
+    },
+    {
+      "id": "c529-1",
+      "label": "529 (child 1)",
+      "kind": "expenseEssential",
+      "amount": {
+        "perMonth": 1300
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2027,
+          "month": 6
+        },
+        "to": {
+          "calendarYear": 2045,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "daycare-2",
+      "label": "Daycare (child 2)",
+      "kind": "expenseEssential",
+      "amount": {
+        "perMonth": 2200
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2030,
+          "month": 1
+        },
+        "durationYears": 4.5
+      }
+    },
+    {
+      "id": "c529-2",
+      "label": "529 (child 2)",
+      "kind": "expenseEssential",
+      "amount": {
+        "perMonth": 1300
+      },
+      "timing": {
+        "from": {
+          "calendarYear": 2029,
+          "month": 6
+        },
+        "to": {
+          "calendarYear": 2047,
+          "month": 6
+        }
+      }
+    }
+  ]
+}

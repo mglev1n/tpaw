@@ -526,7 +526,6 @@ mod tests {
     use rand_chacha::ChaCha20Rng;
 
     use crate::{
-        cuda_bridge::cuda_get_empirical_annual_non_log_mean,
         expected_value_of_returns::EmpiricalAnnualNonLogExpectedReturnInfo,
         historical_monthly_returns::data::{get_empirical_stats_for_block_size, EmpiricalStats32},
         utils::{

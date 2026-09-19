@@ -8,6 +8,7 @@ pub mod estimate_portfolio_balance;
 pub mod historical_monthly_returns;
 pub mod market_data;
 pub mod serve;
+pub mod sim_cpu;
 pub mod simulate;
 pub mod utils;
 pub mod wire;
