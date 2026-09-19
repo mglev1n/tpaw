@@ -54,7 +54,7 @@ for key, curve in by.items():
 
 fmt = lambda v: (usd(v[0]) if v[1] == 'ok'
                  else ('>' + usd(FLOORS[-1]) if v[1] == 'above'
-                       else f'max {100 * v[0]:.0f}%'))
+                       else f'fails {100 * (1 - v[0]):.0f}%'))
 CONDS = [('base-returns', 'Base'), ('pessimistic', 'Pessimistic'),
          ('severe', 'Severe')]
 SIMONE = [('full', 'Simone full time'), ('p50p', '0.5 FTE permanent'),
@@ -70,8 +70,11 @@ print('=' * 94)
 print(f'HIGHEST FLOOR SUSTAINED AT {TARGET:.0%} CONFIDENCE  ($/mo, real)')
 print('=' * 94)
 print('Public K-12 + in-state college, no legacy, severe returns.')
-print('"max N%" means 90% is unreachable at ANY floor: lifestyle spending is not')
-print('the binding constraint, the essential expenses are.\n')
+print('A dollar figure is the floor you could promise yourself and keep 90% of')
+print('the time. "fails N%" means NO floor reaches 90% -- even promising $4,000 a')
+print('month, the plan still runs out of money N% of the time, because lifestyle')
+print('spending is not what is breaking it. The house, college and the parents')
+print('are, and you cannot economise your way out of those.\n')
 print(f"{'':<30}" + ''.join(f'{n:>16}' for _p, n in PARENTS))
 for rid, age in (('r55', 55), ('r60', 60), ('r65', 65)):
     print(f'\nRetire at {age}')

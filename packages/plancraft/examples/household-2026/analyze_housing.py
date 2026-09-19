@@ -41,7 +41,7 @@ def solve(curve):
 solved = {k: solve(c) for k, c in by.items()}
 fmt = lambda v: (usd(v[0]) if v[1] == 'ok'
                  else ('>' + usd(FLOORS[-1]) if v[1] == 'above'
-                       else f'max {100 * v[0]:.0f}%'))
+                       else f'fails {100 * (1 - v[0]):.0f}%'))
 NAMES = {h[0]: h[1] for h in H.HOUSING}
 ORDER = [h[0] for h in H.HOUSING]
 PAR = [('none', 'No support'), ('br50', 'Brazil, half'), ('us50', 'US, half')]
@@ -49,7 +49,12 @@ PAR = [('none', 'No support'), ('br50', 'Brazil, half'), ('us50', 'US, half')]
 print('=' * 96)
 print('HIGHEST FLOOR AT 90% CONFIDENCE, BY HOUSE AND FINANCING  (severe returns)')
 print('=' * 96)
-print('Simone full time, public K-12 + in-state college, no legacy.\n')
+print('Simone full time, public K-12 + in-state college, no legacy.')
+print('')
+print('A dollar figure is the floor you could promise yourself and keep 90% of the')
+print('time. "fails N%" means NO floor reaches 90%: even promising $4,000 a month,')
+print('the plan still runs out of money N% of the time. Lifestyle spending is not')
+print('what breaks those cells -- the house, college and the parents are.\n')
 print(f"{'':<32}" + ''.join(f'{"retire " + str(a):>17}' for a in (55, 60, 65)))
 for pid, pname in PAR:
     print(f'\n{pname}')
