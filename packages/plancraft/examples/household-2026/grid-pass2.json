@@ -1,13 +1,27 @@
 {
   "plancraftGrid": 1,
   "name": "Pass 2: the highest floor each choice can promise",
-  "description": "The same household against a ladder of retirement spending floors, so the answer comes out in dollars a month rather than percentage points. For each combination the analysis interpolates the highest floor sustained at 90% confidence. This prices decisions that the fixed-floor pass could not: a legacy target suppresses spending and therefore looked SAFER there, because success measured only whether the floor held and never what was given up above it. Parental support carries a share axis, since it is a negotiation rather than a fact. Child living costs are held at the middle adder and the house at the $850,000 Cherry Hill purchase, both having ranked below the levers kept here. The FERS annuity is included throughout and retirement health cover is deliberately not modelled.",
+  "description": "The same household against a ladder of retirement spending floors, so the answer comes out in dollars a month rather than percentage points. For each combination the analysis interpolates the highest floor sustained at 90% confidence. This prices decisions that the fixed-floor pass could not: a legacy target suppresses spending, so it buys a HIGHER promised floor while costing median spending -- the two are complements rather than substitutes. Parental support carries a share axis, since it is a negotiation rather than a fact. Child living costs are held at the middle adder and the house at the $850,000 Cherry Hill purchase, both having ranked below the levers kept here. The FERS annuity is included throughout and retirement health cover is deliberately not modelled.",
   "base": "base.scenario.json",
   "dimensions": [
     {
       "id": "floor",
       "name": "Spending floor",
       "variants": [
+        {
+          "id": "f4",
+          "name": "$4,000/mo floor",
+          "simulation": {
+            "spendingFloor": 4000
+          }
+        },
+        {
+          "id": "f6",
+          "name": "$6,000/mo floor",
+          "simulation": {
+            "spendingFloor": 6000
+          }
+        },
         {
           "id": "f8",
           "name": "$8,000/mo floor",

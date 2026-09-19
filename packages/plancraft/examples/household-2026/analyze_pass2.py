@@ -12,7 +12,7 @@ the crossing.
 """
 import collections, csv, sys
 
-FLOORS = [8_000, 12_000, 16_000, 20_000, 24_000, 28_000]
+FLOORS = [4_000, 6_000, 8_000, 12_000, 16_000, 20_000, 24_000, 28_000]
 TARGET = 0.90
 DIMS = ['retire', 'simone', 'school', 'parents', 'legacy']
 usd = lambda v: '$' + format(round(v), ',')
@@ -99,21 +99,36 @@ for dim, pairs in (
                   f'   ({len(deltas)} pairs)')
 
 print('\n' + '=' * 94)
-print('THE LEGACY, PRICED PROPERLY')
+print('THE LEGACY: A COMPLEMENT TO THE FLOOR, NOT A COMPETITOR FOR IT')
 print('=' * 94)
-print('Pass 1 scored a $5M legacy as SAFER than none, because floor-success is')
-print('blind to spending above the floor. In dollars of promised floor it is not:\n')
+print('I predicted this metric would show a legacy COSTING promised floor, since a')
+print('bequest has to be funded before spending. It does not, and the reasoning was')
+print('wrong. A legacy target suppresses discretionary spending ABOVE the floor,')
+print('which preserves the portfolio, which makes a HIGHER floor sustainable.')
+print('Switching metrics could never have fixed this: both ask about the floor, and')
+print('nothing that suppresses upside spending looks bad to either.')
+print('')
+print('The legacy is not free. It is paid in median spending, not in floor --')
+print('so both halves of the trade have to be shown together:')
+print('')
+spend = collections.defaultdict(dict)
+for r in rows:
+    k = (r['condition'],) + tuple(r[d] for d in DIMS[:-1]) + (r['floor'],)
+    spend[k][r['legacy']] = float(r['medianRetirementSpendingPerMonth'])
 for cid, cname in CONDS:
-    d = []
+    df, ds = [], []
     for key, val in solved.items():
         if key[0] != cid or key[-1] != 'none' or val[1] != 'ok':
             continue
         o = solved.get(key[:-1] + ('m5',))
         if o and o[1] == 'ok':
-            d.append(o[0] - val[0])
-    if d:
-        print(f'  {cname:<14}{usd(mean(d)) + "/mo":>12} of floor given up '
-              f'({len(d)} pairs)')
+            df.append(o[0] - val[0])
+    for k, v in spend.items():
+        if k[0] == cid and 'none' in v and 'm5' in v:
+            ds.append(v['m5'] - v['none'])
+    if df and ds:
+        print(f'  {cname:<13}promised floor {usd(mean(df)) + "/mo":>10}   '
+              f'median spending {usd(mean(ds)) + "/mo":>10}')
 
 print('\n' + '=' * 94)
 print('A $12,000 FLOOR: WHAT COMBINATIONS CLEAR IT')

@@ -34,7 +34,11 @@ def _load(name, path):
 L = _load('levers', os.path.join(HERE, 'levers.py'))
 B, I = L.B, L.I
 
-FLOORS = [8_000, 12_000, 16_000, 20_000, 24_000, 28_000]
+# Extended down to $4,000 after the first run returned "<$8,000" for every
+# retire-55 cell: the bottom rung has to sit below the answer or the ladder
+# cannot resolve the decision that most needs resolving. Eight rungs is the
+# schema's per-dimension cap.
+FLOORS = [4_000, 6_000, 8_000, 12_000, 16_000, 20_000, 24_000, 28_000]
 CHILD_ADDER = L.CHILD_ADDER['mid'][1]
 
 SIMONE = collections.OrderedDict([
@@ -67,9 +71,9 @@ grid = collections.OrderedDict([
         'answer comes out in dollars a month rather than percentage points. For '
         'each combination the analysis interpolates the highest floor sustained at '
         '90% confidence. This prices decisions that the fixed-floor pass could not: '
-        'a legacy target suppresses spending and therefore looked SAFER there, '
-        'because success measured only whether the floor held and never what was '
-        'given up above it. Parental support carries a share axis, since it is a '
+        'a legacy target suppresses spending, so it buys a HIGHER promised floor '
+        'while costing median spending -- the two are complements rather than '
+        'substitutes. Parental support carries a share axis, since it is a '
         'negotiation rather than a fact. Child living costs are held at the middle '
         'adder and the house at the $850,000 Cherry Hill purchase, both having '
         'ranked below the levers kept here. The FERS annuity is included throughout '
