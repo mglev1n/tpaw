@@ -36,8 +36,16 @@ DIMS = ['childcost', 'simone', 'school', 'parents', 'legacy', 'retire']
 mean = lambda a: sum(a) / len(a) if a else float('nan')
 
 
-def peak_and_savings(row):
-    """Peak annual essential expenses, and the lowest sustained savings rate."""
+def cashflow(row):
+    """Year-by-year net contribution across the working years.
+
+    An earlier version of this compared the single worst expense year against
+    the single worst income year and called any shortfall unpayable. That is
+    wrong twice over: the two need not fall in the same year, and a household
+    with a portfolio can run a deficit year without being insolvent -- that is
+    what a portfolio is for. What actually makes a plan unfundable is a
+    sustained deficit, so the test is the MEAN net contribution across the
+    working years, with the worst single year reported alongside for context."""
     evs = (L.child_living_events(L.CHILD_ADDER[row['childcost']][1])
            + L.schooling_events(*L.SCHOOLING[row['school']][1:])
            + B.house_events(B.HOUSES[L.HOUSE][1]))
@@ -57,9 +65,25 @@ def peak_and_savings(row):
         y1 = t['to'].get('calendarYear', 2060)
         for y in range(t['from']['calendarYear'], min(y1, 2060) + 1):
             peak[y] = peak.get(y, 0) + amt
-    _nm, lvl, _tmp = L.SIMONE[row['simone']]
-    low = CF.net_income(I.MICHAEL_GROSS + lvl) - B.LIVING
-    return (max(peak.values()) if peak else 0), low
+    # Savings year by year, following the Simone variant's actual phases
+    # rather than assuming the step-down lasts forever.
+    _nm, lvl, tmp = L.SIMONE[row['simone']]
+    retire_year = L.ANCHOR + (int(row['retire'][1:]) - I.AGE['michael'])
+    full_net = CF.net_income(I.MICHAEL_GROSS + L.FULL) - B.LIVING
+    down_net = CF.net_income(I.MICHAEL_GROSS + lvl) - B.LIVING
+    fellow_net = CF.net_income(I.MICHAEL_GROSS + I.SIMONE_FELLOW_GROSS) - B.LIVING
+    nets = []
+    for y in range(L.ANCHOR, retire_year):
+        if y <= L.FELLOW_Y:
+            sav = fellow_net
+        elif y < L.STEP_DOWN_YEAR:
+            sav = full_net
+        elif tmp and y >= L.RETURN_YEAR:
+            sav = full_net
+        else:
+            sav = down_net
+        nets.append(sav - peak.get(y, 0))
+    return (sum(nets) / len(nets) if nets else 0.0), (min(nets) if nets else 0.0)
 
 
 rows = []
@@ -67,9 +91,9 @@ for r in csv.DictReader(open(sys.argv[1])):
     r['ok'] = float(r['successProbability'])
     r['spend'] = float(r['medianRetirementSpendingPerMonth'])
     r['p5floor'] = float(r['p5SpendingFloorPerMonth'])
-    pk, sav = peak_and_savings(r)
-    r['peak'], r['sav'] = pk, sav
-    r['feasible'] = pk <= sav
+    avg, worst = cashflow(r)
+    r['avgnet'], r['worstyear'] = avg, worst
+    r['feasible'] = avg >= 0
     rows.append(r)
 
 CONDS = ['base-returns', 'pessimistic', 'severe']
@@ -78,8 +102,12 @@ print('=' * 92)
 print('FEASIBILITY CENSUS')
 print('=' * 92)
 nf = [r for r in base if not r['feasible']]
-print(f'{len(base) - len(nf)} of {len(base)} combinations are payable out of cash flow; '
-      f'{len(nf)} are not.')
+print(f'{len(base) - len(nf)} of {len(base)} combinations sustain a non-negative mean '
+      f'contribution\nacross the working years; {len(nf)} do not.')
+deficits = [r for r in base if r['worstyear'] < 0]
+print(f'{len(deficits)} run at least one deficit year, which a portfolio absorbs; '
+      f'the deepest\nsingle year across all combinations is '
+      f'{usd(min(r["worstyear"] for r in base))}.')
 if nf:
     print('\nUnpayable combinations concentrate in:')
     for d in DIMS:
